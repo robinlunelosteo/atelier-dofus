@@ -253,3 +253,7 @@ html[data-lt]{--gy:#9a6700;--gr:#c62828;--gb:#0a5fc2}
 .alm-quick{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px}
 .alm-quick .gchip{padding:4px 10px;border-radius:99px;font-size:13px;cursor:pointer}
 .alm-quick .gchip.on{background:var(--gold);color:#1a1033;border-color:var(--gold);font-weight:600}
+
+/* Ocre : initiales lisibles + barre de choix toujours visible */
+.arch-who span{width:auto;min-width:18px;height:18px;padding:0 5px;border-radius:9px}
+.ocre-who{position:sticky;top:0;z-index:5;background:var(--bg,var(--surf));padding:8px 0;margin-bottom:6px}

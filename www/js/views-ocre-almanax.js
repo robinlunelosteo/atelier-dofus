@@ -28,6 +28,7 @@ Views.ocre = (main) => {
   if (!sel.length) sel = [st.persos[0].id];
   st.prefs.ocreSel = sel; st.prefs.ocrePerso = sel[0];
   const setSel = (l) => { if (!l.length) return; st.prefs.ocreSel = l; st.prefs.ocrePerso = l[0]; touch(); rerender(); };
+  const ini = (p) => { const n = p.nom.trim(); let k = 1; const o = st.persos.filter((x) => x.id !== p.id); while (k < n.length && o.some((x) => x.nom.trim().slice(0, k).toLowerCase() === n.slice(0, k).toLowerCase())) k++; return n.slice(0, k); };
   const has = (id, a) => !!(S().ocre[id] || {})[a.id];
   const mineAll = (a) => sel.every((id) => has(id, a));
   const setFor = (a, v) => { sel.forEach((id) => { const o = ocreOf(id); if (v) o[a.id] = true; else delete o[a.id]; }); };
@@ -60,7 +61,7 @@ Views.ocre = (main) => {
         monImg(a.g, 'lg'), h('div', { class: 'arch-main' }, h('b', null, a.n), h('div', { class: 'muted sm' }, 'niv. ' + a.l + (a.base ? ' · ' + a.base : '')),
           h('div', { class: 'muted sm' }, '📍 ' + (a.subN.slice(0, 2).join(', ') || a.zone))),
         h('div', { class: 'tick' }, ok ? '✓' : ''),
-        multi ? h('div', { class: 'arch-who' }, st.persos.map((p) => h('span', { class: has(p.id, a) ? 'on' : '', title: p.nom }, p.nom.charAt(0).toUpperCase()))) : null); };
+        multi ? h('div', { class: 'arch-who' }, st.persos.map((p) => h('span', { class: has(p.id, a) ? 'on' : '', title: p.nom }, ini(p)))) : null); };
     if (U.group) {
       const byZ = new Map();
       arr.forEach((a) => { if (!byZ.has(a.zone)) byZ.set(a.zone, []); byZ.get(a.zone).push(a); });

@@ -1,14 +1,14 @@
 {
-"version": "1.4.0",
-"notes": "Guides plus clairs, étapes 1-54 cochées, choix des persos Ocre, pages Almanax par perso, accueil simplifié",
+"version": "1.4.1",
+"notes": "Ocre : initiales distinctes, choix des persos toujours visible",
 "files": {
 "css/carte2.css": {
 "h": "3601dfdbba0cf796f08c50867e8b16738e34d1c126cca626dddfe0d70626ac85",
 "s": 450
 },
 "css/style.css": {
-"h": "9e0b79bcde1f5bde0b4476a19dc7c46ce94799b4a6287535b9aa420626d25408",
-"s": 91190
+"h": "42d60f387af4e234837218013bd495691a77a8d36769e481da5d3868149bd1ac",
+"s": 91451
 },
 "data/almanax.js": {
 "h": "e8e2ec568980d33e9c3847295668cf84e55d93b0b3a538ab4dd5dfdccf22f4d4",
@@ -1047,8 +1047,8 @@
 "s": 24928
 },
 "js/views-ocre-almanax.js": {
-"h": "855db71050f9658462bf1c1a33345000152cdd6f5e3919184e5b64d55593301a",
-"s": 15363
+"h": "f3a37a52afab9bb54e94d97b0529aa24ac535861c0414339d290cc1f6eb9b016",
+"s": 15588
 },
 "js/views-persos.js": {
 "h": "dd30ea61f2cfa005b96bbd6576fbb67cb9ef090094be759367c08f6651b7ee5c",
