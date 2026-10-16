@@ -1,0 +1,4 @@
+/* Carte : raccourcis « Aller à » et onglets de mondes */
+.gorow { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 8px 0 4px; }
+.gochip { font: inherit; font-size: 12.5px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line, rgba(255,255,255,.18)); background: rgba(255,255,255,.06); color: inherit; cursor: pointer; }
+.gochip:hover { background: rgba(255,205,90,.18); border-color: rgba(255,205,90,.6); }
