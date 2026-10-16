@@ -478,5 +478,6 @@ async function boot() {
   buildShell();
   window.addEventListener('hashchange', () => route());
   route();
+  if (window.GuidesAPI && GuidesAPI.catchUp) { const n = GuidesAPI.catchUp(); if (n) setTimeout(() => toast('Progression mise à jour : guide complet jusqu\'à l\'étape 54 et ' + n + ' autres guides marqués faits'), 1200); }
 }
 window.addEventListener('DOMContentLoaded', boot);

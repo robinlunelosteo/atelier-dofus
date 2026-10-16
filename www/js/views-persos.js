@@ -527,7 +527,7 @@ function comptaPanel(p, b) {
 
 /* ---------------- compta globale ---------------- */
 Views.compta = (main) => {
-  main.appendChild(h('div', { class: 'page-head' }, h('div', null, h('h1', null, 'Compta des stuffs'), h('p', { class: 'muted' }, 'Coût de chaque perso et de ses objets, ce que tu as payé, ce que ça vaut aujourd\'hui, et ce que tu peux revendre.'))));
+  main.appendChild(h('div', { class: 'page-head' }, h('div', null, h('h1', null, 'Compta'), h('p', { class: 'muted' }, 'Coût de chaque perso et de ses objets, ce que tu as payé, ce que ça vaut aujourd\'hui, et ce que tu peux revendre.'))));
   if (!S().persos.length) { main.appendChild(h('div', { class: 'card empty' }, 'Crée d\'abord un personnage.')); return; }
   let G = { paid: 0, mkt: 0, toBuy: 0, loss: 0 };
   const t = h('table', { class: 'tbl hover wide stack' }, h('thead', null, h('tr', null, ['Perso', 'Build', 'Objets', 'Valeur marché', 'Reste à acheter', 'Payé', 'Perte / gain revente', ''].map((x) => h('th', null, x)))));

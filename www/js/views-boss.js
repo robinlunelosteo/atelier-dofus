@@ -146,7 +146,7 @@
   Views.boss = (main) => {
     const u = U(); B();
     if (!S().persos.length) { main.appendChild(h('div', { class: 'card empty' }, h('div', { class: 'big' }, '👹'), h('h2', null, 'Crée d\'abord un personnage'), h('p', { class: 'muted' }, 'Pour valider les boss et les avis, il faut au moins un perso.'), h('a', { class: 'btn primary', href: '#/persos' }, 'Créer un perso'))); return; }
-    main.appendChild(h('div', { class: 'page-head' }, h('div', null, h('h1', null, 'Boss & avis de recherche'), h('p', { class: 'muted' }, 'Mécaniques des boss de donjon et des criminels recherchés : l\'essentiel, sans le roman.'))));
+    main.appendChild(h('div', { class: 'page-head' }, h('div', null, h('h1', null, 'Boss & avis'), h('p', { class: 'muted' }, 'Mécaniques des boss de donjon et des criminels recherchés : l\'essentiel, sans le roman.'))));
     const box = h('div', { class: 'card empty' }, h('div', { class: 'big' }, '👹'), h('p', { class: 'muted' }, 'Chargement…')); main.appendChild(box);
     load().then(() => {
       if (!document.body.contains(box)) return; box.remove();

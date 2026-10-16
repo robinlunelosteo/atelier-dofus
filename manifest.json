@@ -1,14 +1,14 @@
 {
-"version": "1.3.3",
-"notes": "Nouveau : cliquer sur une position dans un guide copie la commande /travel, ou /zaap puis /travel quand le guide indique un zaap.",
+"version": "1.4.0",
+"notes": "Guides plus clairs, étapes 1-54 cochées, choix des persos Ocre, pages Almanax par perso, accueil simplifié",
 "files": {
 "css/carte2.css": {
 "h": "3601dfdbba0cf796f08c50867e8b16738e34d1c126cca626dddfe0d70626ac85",
 "s": 450
 },
 "css/style.css": {
-"h": "9e2a3877cb4db555c6d265750f0948636c86fe7bdc9a6b6d6ce93bf64b222754",
-"s": 87667
+"h": "9e0b79bcde1f5bde0b4476a19dc7c46ce94799b4a6287535b9aa420626d25408",
+"s": 91190
 },
 "data/almanax.js": {
 "h": "e8e2ec568980d33e9c3847295668cf84e55d93b0b3a538ab4dd5dfdccf22f4d4",
@@ -1003,8 +1003,8 @@
 "s": 1873
 },
 "js/core.js": {
-"h": "b063ce7cb556a9e08101be383f2b05b5f026874a846bce1b4dccf51f876e2c9a",
-"s": 31060
+"h": "af78e940d425f4ab3ac2ea392e5476b72382646b3bd71370c52638d4709338ba",
+"s": 31287
 },
 "js/desktop-sync.js": {
 "h": "834d79ea586b7ece483e41879552e176d459556e23f503a6600454e3fa3f0bb1",
@@ -1027,32 +1027,32 @@
 "s": 7224
 },
 "js/views-boss.js": {
-"h": "cb30c1a129d530f13bf1ba7a9f57fce0f0d6687c5dce37f21da95d7e50326f37",
-"s": 14251
+"h": "86c9a5843f432cb1b4f098e53f3d41754b8f8b7baef2efa6bd9b147d83cfe99f",
+"s": 14238
 },
 "js/views-carte.js": {
 "h": "85d79831836b8ac1941ceafc54d81c0c97006d4eb1326a99f1bb642033b8eb3b",
 "s": 13829
 },
 "js/views-craft.js": {
-"h": "0ab98685e5aa7c9c9db7711e735db0f8e6a31beb2da59313c3296bbf751fae38",
-"s": 19528
+"h": "9c316f922e21874fdf1eaf30fd079332cb1ca7d91cce42626d0d8f61aadb5878",
+"s": 19534
 },
 "js/views-guides.js": {
-"h": "61e6df11601a119442ba683b0156afde00333d2eec6967b2984269de1e1d3fc9",
-"s": 40389
+"h": "44679af668b583ec3182d3457bca74133998629e4c3e35ab3b905a46302f76f4",
+"s": 43147
 },
 "js/views-monde.js": {
-"h": "87f8bb0ed04fecdc0522df8cdb53d8e5fb7cf5e94172579f2e4e2cdb1eb55dd8",
-"s": 27310
+"h": "f344c6592130e8936a1287ffb3bb333e17cb309c7954c2eada56962aea3a7f2f",
+"s": 24928
 },
 "js/views-ocre-almanax.js": {
-"h": "df60c25264f2965e39c2c41a6dccf642c4d3c8a588195b2e9fdde006fdfb8f81",
-"s": 15099
+"h": "855db71050f9658462bf1c1a33345000152cdd6f5e3919184e5b64d55593301a",
+"s": 15363
 },
 "js/views-persos.js": {
-"h": "b7e5a76fb3b83bb31ccdcd9d2d90183c50cc81f88eb9a132a03698b9eaa6ba86",
-"s": 72079
+"h": "dd30ea61f2cfa005b96bbd6576fbb67cb9ef090094be759367c08f6651b7ee5c",
+"s": 72068
 }
 }
 }

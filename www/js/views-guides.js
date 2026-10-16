@@ -74,7 +74,20 @@
   const OK_ATTRS = new Set(['type', 'name', 'imageurl', 'dofusdbid', 'alt', 'title', 'questid', 'questname', 'status', 'guideid', 'stepid', 'stepnumber', 'guidename', 'label', 'baseurl', 'checked', 'width', 'height']);
   const OK_STYLE = new Set(['color', 'text-align', 'font-weight', 'font-style', 'text-decoration', 'background-color']);
   const OK_CLASS = /^(tag-|img-|quest-|guide-|custom-tag)/;
-  function cleanStyle(v) { return v.split(';').map((d) => d.trim()).filter((d) => { const i = d.indexOf(':'); if (i < 0) return false; const k = d.slice(0, i).trim().toLowerCase(), val = d.slice(i + 1); return OK_STYLE.has(k) && !/url\(|expression|javascript|[<>\\]/i.test(val); }).join('; '); }
+  /* couleurs du texte : les jaunes/rouges/blancs criards de Ganymède deviennent des teintes douces qui suivent le thème (clair ou sombre) */
+  function softColor(val) {
+    const t = val.trim().toLowerCase(); let r, g, b, m;
+    if ((m = /^#([0-9a-f]{3}|[0-9a-f]{6})$/.exec(t))) { const x = m[1].length === 3 ? m[1].replace(/./g, '$&$&') : m[1]; r = parseInt(x.slice(0, 2), 16); g = parseInt(x.slice(2, 4), 16); b = parseInt(x.slice(4, 6), 16); }
+    else if ((m = /^rgba?\(\s*(\d+)[ ,]+(\d+)[ ,]+(\d+)/.exec(t))) { r = +m[1]; g = +m[2]; b = +m[3]; }
+    else return val;
+    if (r > 225 && g > 225 && b > 225) return '';                       // blanc : couleur du thème
+    if (r < 40 && g < 40 && b < 40) return '';                          // noir : couleur du thème
+    if (r > 200 && g > 190 && b < 110) return 'var(--gy)';              // jaune
+    if (r > 200 && g < 110 && b < 110) return 'var(--gr)';              // rouge
+    if (b > 190 && r < 140) return 'var(--gb)';                         // bleu
+    return val;
+  }
+  function cleanStyle(v) { return v.split(';').map((d) => d.trim()).filter((d) => { const i = d.indexOf(':'); if (i < 0) return false; const k = d.slice(0, i).trim().toLowerCase(), val = d.slice(i + 1); return OK_STYLE.has(k) && !/url\(|expression|javascript|[<>\\]/i.test(val); }).map((d) => { const i = d.indexOf(':'); const k = d.slice(0, i).trim().toLowerCase(); if (k === 'color') { const c = softColor(d.slice(i + 1)); return c ? 'color: ' + c : ''; } if (k === 'background-color') return ''; return d; }).filter(Boolean).join('; '); }
   function clean(node) {
     [...node.childNodes].forEach((el) => {
       if (el.nodeType === 3) return;
@@ -137,24 +150,25 @@
       const gid = +el.getAttribute('guideid'); el.style.cursor = 'pointer'; el.title = LIB.has(gid) ? 'Ouvrir ce guide' : 'Guide absent de ta bibliothèque — ouvrir sur Ganymède';
       el.addEventListener('click', () => { if (LIB.has(gid)) { U().open = gid; rerender(); } else window.open('https://ganymede-app.com/guides/' + gid, '_blank', 'noopener'); });
     });
-    const positions = [...new Set([...(out.textContent || '').matchAll(/\[(-?\d+), ?(-?\d+)\]/g)].map((m) => m[1] + ',' + m[2]))];
+    const seenPos = new Set(); const positions = [];
+    parsePos(out.textContent || '').forEach((o) => { const k = o.x + ',' + o.y; if (!seenPos.has(k)) { seenPos.add(k); positions.push(o); } });
     posify(out);
     tagify(out);
+    const root = out.firstElementChild || out;
     const stepBar = itemBar(out, gu, i);
-    if (G().simple) {
-      const lists = [...out.querySelectorAll('ul[data-type="taskList"]')].filter((ul) => !ul.parentElement.closest('ul[data-type="taskList"]'));
-      if (lists.length) {
-        const simple = h('div', { class: 'gbody gsimple' });
-        if (positions.length) simple.appendChild(h('div', { class: 'gsec' }, h('div', { class: 'gsec-t' }, '📍 Où aller'), h('div', { class: 'gpos-row' }, positions.slice(0, 8).map((p) => mkPos(...p.split(','))))));
-        simple.appendChild(h('div', { class: 'gsec' }, h('div', { class: 'gsec-t' }, '✅ À faire'), lists));
-        if (stepBar) simple.appendChild(stepBar);
-        if ((out.textContent || '').trim()) simple.appendChild(h('details', { class: 'gmore' }, h('summary', null, '📖 Explications et astuces'), out));
-        return simple;
-      }
+    const sec = (t, ...kids) => h('div', { class: 'gx-sec' }, h('div', { class: 'gx-sec-t' }, t), ...kids);
+    const wrap = h('div', { class: 'gx-body' });
+    const gp = [...root.children].find((el) => el.tagName === 'P' && /^\s*Objectifs?\s*:/i.test(el.textContent));
+    if (gp) { gp.remove(); wrap.appendChild(h('div', { class: 'gx-goal' }, h('span', { class: 'gx-goal-i' }, '🎯'), gp)); }
+    if (positions.length) wrap.appendChild(sec('📍 Où aller', h('div', { class: 'gx-pos' }, positions.slice(0, 6).map((o) => mkPos(o)))));
+    const lists = [...root.querySelectorAll('ul[data-type="taskList"]')].filter((ul) => !ul.parentElement.closest('ul[data-type="taskList"]'));
+    if (lists.length) wrap.appendChild(sec('✅ À faire', h('div', { class: 'gbody' }, lists)));
+    if (stepBar) wrap.appendChild(stepBar);
+    if ((out.textContent || '').trim() || out.querySelector('img')) {
+      if (lists.length) wrap.appendChild(h('details', { class: 'gx-more' }, h('summary', null, '📖 Explications et astuces'), out));
+      else wrap.appendChild(out);
     }
-    if (stepBar) out.insertBefore(stepBar, out.firstChild);
-    if (G().simple && positions.length) out.insertBefore(h('div', { class: 'gsec' }, h('div', { class: 'gsec-t' }, '📍 Où aller'), h('div', { class: 'gpos-row' }, positions.slice(0, 8).map((p) => mkPos(...p.split(','))))), out.firstChild);
-    return out;
+    return wrap;
   }
   let refreshBars = () => {};
 
@@ -243,7 +257,7 @@
       h('div', { class: 'row gap' }, h('label', { class: 'btn' }, '⬆ Importer un guide', h('input', { type: 'file', accept: '.json', multiple: true, style: { display: 'none' }, onchange: async (e) => {
         for (const f of e.target.files) { try { const g = fromExport(JSON.parse(await f.text())); LIB.set(g.id, g); uploadGuide(g); saveIdx(); toast('Guide importé : ' + g.name); } catch (er) { toast('Fichier non reconnu : ' + f.name, 'warn'); } }
         rerender(); } }))));
-    main.appendChild(head);
+    if (!(u.open && LIB.has(u.open))) main.appendChild(head);
     if (u.open && LIB.has(u.open)) {
       const m = LIB.get(u.open); if (m.steps) { reader(main, m); return; }
       const box = h('div', { class: 'card empty' }, h('div', { class: 'big' }, '📜'), h('p', { class: 'muted' }, 'Chargement du guide…')); main.appendChild(box);
@@ -302,15 +316,19 @@
 
   function reader(main, gu) {
     const u = U(); const g = G(); const n = gu.n; let i = curStep(gu.id); const PER = 1; if (g.last !== gu.id) { g.last = gu.id; touch(); }
-    main.appendChild(h('div', { class: 'row gap wrap', style: { marginBottom: '8px' } }, h('button', { class: 'btn ghost', onclick: () => { u.open = null; location.hash = '#/guides'; rerender(); } }, '← Guides'), h('h2', null, gu.name), h('span', { class: 'sp' }),
-      h('button', { class: 'btn', title: 'Vue simple : positions et cases à cocher d\'abord, explications repliées', onclick: () => { g.simple = !g.simple; touch(); rerender(); } }, g.simple ? '👁 Voir tout le texte' : '✨ Vue simple'),
-      h('button', { class: 'btn', title: 'Liste : plusieurs étapes à la suite, comme sur Ganymède', onclick: () => { g.view = g.view === 'etape' ? 'liste' : 'etape'; touch(); rerender(); } }, g.view === 'etape' ? '📜 Tout voir (liste)' : '1️⃣ Une étape à la fois'),
-      h('button', { class: 'btn', title: 'Objets à prévoir pour les étapes restantes', onclick: () => shopping(gu) }, '🛒 Liste de courses'),
-      h('button', { class: 'btn' + (g.follow.includes(gu.id) ? ' on' : ''), onclick: () => { g.follow = g.follow.includes(gu.id) ? g.follow.filter((x) => x !== gu.id) : [...g.follow, gu.id]; touch(); rerender(); } }, g.follow.includes(gu.id) ? '📌 Suivi' : '📍 Suivre')));
+    main.appendChild(h('div', { class: 'gx-top' },
+      h('button', { class: 'btn ghost', onclick: () => { u.open = null; location.hash = '#/guides'; rerender(); } }, '← Guides'),
+      h('div', { class: 'gx-title' }, h('h2', null, gu.name), h('small', { class: 'muted' }, 'par ' + gu.author + ' · ' + gu.n + ' étapes')),
+      h('div', { class: 'gx-tools' },
+        h('button', { class: 'btn sm', title: 'Objets à prévoir pour les étapes restantes', onclick: () => shopping(gu) }, '🛒 Courses'),
+        h('button', { class: 'btn sm' + (g.follow.includes(gu.id) ? ' on' : ''), title: 'Suivre ce guide sur l\'accueil et dans « Mes guides suivis »', onclick: () => { g.follow = g.follow.includes(gu.id) ? g.follow.filter((x) => x !== gu.id) : [...g.follow, gu.id]; touch(); rerender(); } }, g.follow.includes(gu.id) ? '📌 Suivi' : '📍 Suivre'),
+        h('div', { class: 'gx-seg' },
+          h('button', { class: g.view !== 'liste' ? 'on' : '', onclick: () => { g.view = 'etape'; touch(); rerender(); } }, 'Étape par étape'),
+          h('button', { class: g.view === 'liste' ? 'on' : '', onclick: () => { g.view = 'liste'; touch(); rerender(); } }, 'Liste')))));
     main.appendChild(whoBar());
     const lay = h('div', { class: 'glay' }); const side = h('div', { class: 'gside card' }); const mid = h('div', { class: 'gmain' }); lay.appendChild(side); lay.appendChild(mid); main.appendChild(lay);
     const barBox = h('div'); const toc = h('div', { class: 'gtoc' });
-    side.appendChild(barBox); side.appendChild(h('h4', null, 'Sommaire')); side.appendChild(toc);
+    side.appendChild(barBox); const tocBox = h('details', { class: 'gx-toc' }, h('summary', null, '📑 Sommaire'), toc); if (window.innerWidth > 820) tocBox.open = true; side.appendChild(tocBox);
     function drawToc() {
       clear(toc); const w = who();
       gu.steps.forEach((st, k) => { const done = w.length && w.every((pid) => isDone(gu.id, pid, k)); const part = !done && w.some((pid) => isDone(gu.id, pid, k));
@@ -319,7 +337,7 @@
     }
     function drawBars() { clear(barBox); barBox.appendChild(bars(gu)); }
     refreshBars = () => { drawBars(); drawToc(); };
-    function go2(k) { i = clamp(k, 0, n - 1); g.cur[gu.id] = i; touch(); draw(g.view !== 'etape' ? i : null); if (g.view === 'etape') mainEl.scrollTop = 0; }
+    function go2(k) { i = clamp(k, 0, n - 1); g.cur[gu.id] = i; touch(); draw(g.view === 'liste' ? i : null); if (g.view !== 'liste') mainEl.scrollTop = 0; }
     const mainEl = document.getElementById('main');
     function pager(page, pages, per) {
       return h('div', { class: 'gpager' },
@@ -331,13 +349,13 @@
     }
     function draw(scrollTo) {
       clear(mid); const w = who();
-      if (g.view !== 'etape') {
+      if (g.view === 'liste') {
         const per = g.per || 3, pages = Math.ceil(n / per), page = Math.floor(i / per), from = page * per, to = Math.min(n, from + per);
         mid.appendChild(pager(page, pages, per));
         for (let k = from; k < to; k++) {
           const dn = w.length && w.every((pid) => isDone(gu.id, pid, k));
           mid.appendChild(h('div', { class: 'card gstep' + (dn ? ' gdone' : ''), id: 'gstep-' + k },
-            h('div', { class: 'gs-head' }, h('b', null, 'Étape ' + (k + 1)), h('span', { class: 'sp' }), h('button', { class: 'btn' + (dn ? ' on' : ' primary'), onclick: () => { const y = mainEl.scrollTop; setStep(gu.id, k, !dn); draw(); mainEl.scrollTop = y; } }, dn ? '✓ Faite' : '✔ Valider' + (w.length > 1 ? ' pour ' + w.length + ' persos' : ''))),
+            h('div', { class: 'gs-head' }, h('div', { class: 'gx-num' }, 'Étape ', h('b', null, k + 1), h('small', null, ' / ' + n)), h('span', { class: 'sp' }), h('button', { class: 'btn' + (dn ? ' on' : ' primary'), onclick: () => { const y = mainEl.scrollTop; setStep(gu.id, k, !dn); draw(); mainEl.scrollTop = y; } }, dn ? '✓ Faite' : '✔ Valider' + (w.length > 1 ? ' pour ' + w.length + ' persos' : ''))),
             renderStep(gu, k)));
         }
         mid.appendChild(pager(page, pages, per));
@@ -347,12 +365,12 @@
       }
       const done = w.length && w.every((pid) => isDone(gu.id, pid, i));
       mid.appendChild(h('div', { class: 'card gstep' },
-        h('div', { class: 'gs-head' }, h('b', null, 'Étape ' + (i + 1) + ' / ' + n), h('span', { class: 'sp' }), h('button', { class: 'btn' + (done ? ' on' : ' primary'), onclick: () => { setStep(gu.id, i, !done); if (!done && i < n - 1) { i++; g.cur[gu.id] = i; } draw(); refreshBars(); } }, done ? '✓ Faite (annuler)' : '✔ Valider' + (w.length > 1 ? ' pour ' + w.length + ' persos' : ''))),
+        h('div', { class: 'gs-head' }, h('div', { class: 'gx-num' }, 'Étape ', h('b', null, i + 1), h('small', null, ' / ' + n)), h('span', { class: 'sp' }), h('button', { class: 'btn' + (done ? ' on' : ' primary'), onclick: () => { setStep(gu.id, i, !done); if (!done && i < n - 1) { i++; g.cur[gu.id] = i; } draw(); refreshBars(); } }, done ? '✓ Faite (annuler)' : '✔ Valider' + (w.length > 1 ? ' pour ' + w.length + ' persos' : ''))),
         renderStep(gu, i),
         h('div', { class: 'row between', style: { marginTop: '14px' } }, h('button', { class: 'btn', disabled: i === 0, onclick: () => go2(i - 1) }, '← Précédente'), h('button', { class: 'btn', disabled: i === n - 1, onclick: () => go2(i + 1) }, 'Suivante →'))));
       drawToc(); drawBars();
     }
-    const key = (e) => { if (!document.getElementById('main') || !location.hash.startsWith('#/guides') || /INPUT|TEXTAREA|SELECT/.test((e.target || {}).tagName || '')) return; if (g.view === 'etape') { if (e.key === 'ArrowRight') go2(i + 1); else if (e.key === 'ArrowLeft') go2(i - 1); } };
+    const key = (e) => { if (!document.getElementById('main') || !location.hash.startsWith('#/guides') || /INPUT|TEXTAREA|SELECT/.test((e.target || {}).tagName || '')) return; if (g.view !== 'liste') { if (e.key === 'ArrowRight') go2(i + 1); else if (e.key === 'ArrowLeft') go2(i - 1); } };
     document.addEventListener('keydown', key); Views._cleanup = () => { document.removeEventListener('keydown', key); refreshBars = () => {}; };
     draw();
   }
@@ -422,8 +440,21 @@
     ov2.appendChild(card); document.body.appendChild(ov2);
   }
   /* résumé pour la page d'accueil */
+  /* mise à niveau unique : le guide complet est à l'étape 55, donc tout ce qu'il demande avant est marqué fait (rien n'est jamais décoché).
+     Guides à moitié : on coche jusqu'à l'étape indiquée par le guide complet ; guides facultatifs, d'alignement et de simple lecture : non touchés. */
+  const CATCH_UP = { 2747: 54, 2: 'tout', 374: 'tout', 3: 'tout', 25: 'tout', 24: 'tout', 306: 'tout', 431: 'tout', 62: 'tout', 183: 4, 104: 13, 66: 19, 30: 22, 2042: 25, 88: 30, 98: 5, 427: 6, 430: 6 };
+  function catchUp() {
+    const g = G(); if (g.rattrape1) return 0; g.rattrape1 = 1;
+    const gp0 = LIB.get(2747); if (!gp0) return 0;
+    const ps = S().persos.filter((p) => countDone(2747, p.id) >= 40); if (!ps.length) return 0;
+    let guides = 0;
+    Object.entries(CATCH_UP).forEach(([gid, upto]) => { gid = +gid; const gu = LIB.get(gid); if (!gu) return; const n = upto === 'tout' ? gu.n : Math.min(upto, gu.n); let any = false;
+      ps.forEach((p) => { const pr = pg(gid, p.id); for (let i = 0; i < n; i++) if (!pr['s' + i]) { pr['s' + i] = 1; any = true; } }); if (any && gid !== 2747) guides++; });
+    g.cur[2747] = Math.max(g.cur[2747] || 0, 54); touch(); return guides;
+  }
   window.GuidesAPI = {
     init: initGuides,
+    catchUp,
     last() {
       if (!S().persos.length) return null; const g = G(); let id = g.last; if (!LIB.has(id)) id = g.follow.find((x) => LIB.has(x)); if (id == null) return null;
       const gu = LIB.get(id); const w = who(); const done = w.length ? Math.min(...w.map((pid) => countDone(id, pid))) : 0;

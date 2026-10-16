@@ -133,7 +133,7 @@ Views.metiers = (main) => {
   const addToLevel = (r, target) => { let guard = 0; while (xpToLevel(actualXp) < target && guard++ < 20000) { if (xpFor(r, xpToLevel(actualXp)) < 1) break; addOne(r); } };
   const nextStep = (extra) => { const t = stepOf(); let l = xpToLevel(actualXp), e = extra || 0; while (e >= 0) { if (l % t !== 0) l -= l % t; l += t; e--; } return l; };
 
-  main.appendChild(h('div', { class: 'page-head' }, h('div', null, h('h1', null, 'XP Métier'), h('p', { class: 'muted' }, 'Choisis un métier, ton niveau (ou ton XP) et le coefficient d\'XP, puis ajoute les recettes qui t\'intéressent. Formules identiques à l\'outil XP Métier de DofusDB.'))));
+  main.appendChild(h('div', { class: 'page-head' }, h('div', null, h('h1', null, 'Atelier métiers'), h('p', { class: 'muted' }, 'Choisis un métier, ton niveau (ou ton XP) et le coefficient d\'XP, puis ajoute les recettes qui t\'intéressent. Formules identiques à l\'outil XP Métier de DofusDB.'))));
   const lvlIn = h('input', { class: 'inp xs', type: 'number', min: 0, max: 200, value: xpToLevel(M.startingXp) });
   lvlIn.addEventListener('change', () => { const l = clamp(+lvlIn.value || 0, 0, 200); M.startingXp = l * (l - 1) * 10; if (M.startingXp < 0) M.startingXp = 0; M.selected = []; save(); });
   const xpIn = h('input', { class: 'inp sm', type: 'number', min: 0, value: M.startingXp });

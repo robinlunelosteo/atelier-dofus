@@ -16,22 +16,30 @@ Views.ocre = (main) => {
   const st = S();
   const U = (Views._ocre = Views._ocre || { q: '', zone: '', statut: 'tous', lmin: 1, lmax: 200, group: true, sort: 'zone' });
   main.appendChild(h('div', { class: 'page-head' }, h('div', null, h('h1', null, 'Suivi Ocre'),
-    h('p', { class: 'muted' }, 'Archimonstres à capturer pour le Dofus Ocre — coche ceux que ton perso a déjà.'))));
+    h('p', { class: 'muted' }, 'Choisis tes persos, puis touche les archimonstres capturés.'))));
   if (!st.persos.length) {
     main.appendChild(h('div', { class: 'card empty' }, h('div', { class: 'big' }, '🟠'), h('p', null, 'Crée un personnage pour suivre sa progression Ocre.'), h('a', { class: 'btn primary', href: '#/persos' }, 'Créer un personnage')));
     return;
   }
   const total = ARCHI.length;
-  if (!st.prefs.ocrePerso || !getPerso(st.prefs.ocrePerso)) st.prefs.ocrePerso = st.persos[0].id;
-  const pid = st.prefs.ocrePerso;
-  const mine = ocreOf(pid);
-  const multi = st.persos.length > 1; const allOn = multi && !!st.prefs.ocreTous; /* « les N » : une capture s'applique à tous les persos */
-  const setFor = (a, v) => { (allOn ? st.persos.map((x) => x.id) : [pid]).forEach((id) => { const o = ocreOf(id); if (v) o[a.id] = true; else delete o[a.id]; }); };
+  delete st.prefs.ocreTous;
+  /* persos « sélectionnés » : une capture cochée s'applique à tous ceux-là (un seul, plusieurs, ou toute l'équipe) */
+  let sel = (st.prefs.ocreSel || [st.prefs.ocrePerso]).filter((id) => getPerso(id));
+  if (!sel.length) sel = [st.persos[0].id];
+  st.prefs.ocreSel = sel; st.prefs.ocrePerso = sel[0];
+  const setSel = (l) => { if (!l.length) return; st.prefs.ocreSel = l; st.prefs.ocrePerso = l[0]; touch(); rerender(); };
+  const has = (id, a) => !!(S().ocre[id] || {})[a.id];
+  const mineAll = (a) => sel.every((id) => has(id, a));
+  const setFor = (a, v) => { sel.forEach((id) => { const o = ocreOf(id); if (v) o[a.id] = true; else delete o[a.id]; }); };
+  const multi = st.persos.length > 1;
 
-  // vue d'ensemble
+  // vue d'ensemble : toucher un perso l'ajoute ou le retire de la sélection
+  if (multi) main.appendChild(h('div', { class: 'ocre-who' }, h('span', { class: 'muted sm' }, 'Je coche pour :'),
+    st.persos.map((p) => h('button', { class: 'gchip' + (sel.includes(p.id) ? ' on' : ''), onclick: () => setSel(sel.includes(p.id) ? sel.filter((x) => x !== p.id) : [...sel, p.id]) }, p.nom)),
+    h('button', { class: 'gchip' + (sel.length === st.persos.length ? ' on' : ''), onclick: () => setSel(st.persos.map((p) => p.id)) }, '👥 Toute l\'équipe')));
   main.appendChild(h('div', { class: 'ocre-over' }, st.persos.map((p) => {
     const n = ocreCount(p.id);
-    return h('button', { class: 'ocre-p' + (p.id === pid ? ' on' : ''), onclick: () => { st.prefs.ocrePerso = p.id; touch(); rerender(); } },
+    return h('div', { class: 'ocre-p' + (sel.includes(p.id) ? ' on' : '') },
       h('div', { class: 'row between' }, h('b', null, p.nom), h('span', { class: 'muted sm' }, className(p.classe))),
       progress(n / total * 100), h('div', { class: 'row between' }, h('span', null, n + ' / ' + total), h('b', null, (n / total * 100).toFixed(1) + ' %')));
   })));
@@ -42,38 +50,35 @@ Views.ocre = (main) => {
     clear(list);
     const q = norm(U.q);
     let arr = ARCH_INFO.filter((a) => a.l >= U.lmin && a.l <= U.lmax && (!U.zone || a.zone === U.zone)
-      && (U.statut === 'tous' || (U.statut === 'ok' ? mine[a.id] : !mine[a.id]))
+      && (U.statut === 'tous' || (U.statut === 'ok' ? mineAll(a) : !mineAll(a)))
       && (!q || norm(a.n).includes(q) || norm(a.base).includes(q) || a.subN.some((s) => norm(s).includes(q))));
     const sorter = { niveau: (a, b) => a.l - b.l || a.n.localeCompare(b.n), nom: (a, b) => a.n.localeCompare(b.n), zone: (a, b) => a.zone.localeCompare(b.zone) || a.l - b.l };
     arr.sort(sorter[U.sort] || sorter.zone);
-    info.textContent = arr.length + ' archimonstre(s) affiché(s) — ' + arr.filter((a) => mine[a.id]).length + ' capturé(s)';
-    const card = (a) => h('div', { class: 'arch' + (mine[a.id] ? ' ok' : ''), onclick: () => { setFor(a, !mine[a.id]); touch(); const sc = $('#main').scrollTop; rerender(); $('#main').scrollTop = sc; } },
-      monImg(a.g, 'lg'), h('div', { class: 'arch-main' }, h('b', null, a.n), h('div', { class: 'muted sm' }, 'niv. ' + a.l + (a.base ? ' · ' + a.base : '')),
-        h('div', { class: 'muted sm' }, '📍 ' + (a.subN.slice(0, 2).join(', ') || a.zone))),
-      h('div', { class: 'tick' }, mine[a.id] ? '✓' : ''));
+    info.textContent = arr.length + ' archimonstre(s) — ' + arr.filter(mineAll).length + ' capturé(s)' + (multi ? ' par ' + (sel.length === st.persos.length && sel.length > 1 ? 'toute l\'équipe' : sel.map((id) => getPerso(id).nom).join(' + ')) : '');
+    const card = (a) => { const ok = mineAll(a);
+      return h('div', { class: 'arch' + (ok ? ' ok' : ''), onclick: () => { setFor(a, !ok); touch(); const sc = $('#main').scrollTop; rerender(); $('#main').scrollTop = sc; } },
+        monImg(a.g, 'lg'), h('div', { class: 'arch-main' }, h('b', null, a.n), h('div', { class: 'muted sm' }, 'niv. ' + a.l + (a.base ? ' · ' + a.base : '')),
+          h('div', { class: 'muted sm' }, '📍 ' + (a.subN.slice(0, 2).join(', ') || a.zone))),
+        h('div', { class: 'tick' }, ok ? '✓' : ''),
+        multi ? h('div', { class: 'arch-who' }, st.persos.map((p) => h('span', { class: has(p.id, a) ? 'on' : '', title: p.nom }, p.nom.charAt(0).toUpperCase()))) : null); };
     if (U.group) {
       const byZ = new Map();
       arr.forEach((a) => { if (!byZ.has(a.zone)) byZ.set(a.zone, []); byZ.get(a.zone).push(a); });
       byZ.forEach((as, z) => {
-        const done = as.filter((a) => mine[a.id]).length;
+        const done = as.filter(mineAll).length;
         list.appendChild(h('div', { class: 'zone-head' }, h('h3', null, z), h('span', { class: 'muted' }, done + ' / ' + as.length), progress(done / as.length * 100)));
         list.appendChild(h('div', { class: 'arch-grid' }, as.map(card)));
       });
     } else list.appendChild(h('div', { class: 'arch-grid' }, arr.map(card)));
     if (!arr.length) list.appendChild(h('div', { class: 'muted center' }, 'Aucun résultat.'));
-    visible = arr;
   };
-  let visible = [];
   const bar = h('div', { class: 'card filters' },
     h('input', { class: 'inp', placeholder: 'Rechercher (nom, zone…)', value: U.q, oninput: (e) => { U.q = e.target.value; render(); } }),
     h('select', { class: 'inp', onchange: (e) => { U.zone = e.target.value; render(); } }, h('option', { value: '' }, 'Toutes les zones'), OCRE_ZONES.map((z) => h('option', { value: z, selected: z === U.zone }, z))),
     h('select', { class: 'inp', onchange: (e) => { U.statut = e.target.value; render(); } }, [['tous', 'Tous'], ['ko', 'Manquants'], ['ok', 'Capturés']].map(([k, n]) => h('option', { value: k, selected: k === U.statut }, n))),
     h('label', { class: 'lbl inline' }, 'Niv.', h('input', { class: 'inp xs', type: 'number', value: U.lmin, onchange: (e) => { U.lmin = +e.target.value || 1; render(); } }), '–', h('input', { class: 'inp xs', type: 'number', value: U.lmax, onchange: (e) => { U.lmax = +e.target.value || 200; render(); } })),
     h('select', { class: 'inp', onchange: (e) => { U.sort = e.target.value; render(); } }, [['zone', 'Tri : zone'], ['niveau', 'Tri : niveau'], ['nom', 'Tri : nom']].map(([k, n]) => h('option', { value: k, selected: k === U.sort }, n))),
-    h('label', { class: 'chk' }, h('input', { type: 'checkbox', checked: U.group, onchange: (e) => { U.group = e.target.checked; render(); } }), 'Grouper par zone'),
-    multi ? h('button', { class: 'btn sm' + (allOn ? ' primary' : ''), title: 'Quand c\'est activé, cocher ou décocher un archimonstre s\'applique à tous tes persos', onclick: () => { st.prefs.ocreTous = !allOn; touch(); rerender(); } }, (allOn ? '✓ ' : '') + '👥 Les ' + st.persos.length + ' persos') : null,
-    h('button', { class: 'btn sm', onclick: () => { visible.forEach((a) => setFor(a, true)); touch(); rerender(); } }, 'Tout cocher (affichés)'),
-    h('button', { class: 'btn sm', onclick: () => { visible.forEach((a) => setFor(a, false)); touch(); rerender(); } }, 'Tout décocher'));
+    h('label', { class: 'chk' }, h('input', { type: 'checkbox', checked: U.group, onchange: (e) => { U.group = e.target.checked; render(); } }), 'Grouper par zone'));
   main.appendChild(bar); main.appendChild(info); main.appendChild(list);
   render();
 };
@@ -88,6 +93,9 @@ Views.almanax = (main, dateArg) => {
   const U = (Views._alm = Views._alm || { sel: today, month: today.slice(0, 7), days: 14 });
   if (dateArg) U.sel = dateArg;
   const a = ALM.get(U.sel);
+  /* pages de journal : 1 page par offrande faite ; 365 pages pour le Dofus Dolmanax */
+  const pagesOf = (pid) => { const dates = new Set(Object.keys(st.almanax.fait).map((k) => k.split('|')[1])); return [...dates].filter((d) => almDone(pid, d) || almDone('all', d)).length; };
+  const streakOf = (pid) => { let n = 0; let d = today; if (!almDone(pid, d) && !almDone('all', d)) d = addDays(d, -1); while (almDone(pid, d) || almDone('all', d)) { n++; d = addDays(d, -1); if (n > 400) break; } return n; };
   main.appendChild(h('div', { class: 'page-head' }, h('div', null, h('h1', null, 'Almanax'), h('p', { class: 'muted' }, 'Bonus du jour, offrande à apporter, calendrier et suivi.')),
     h('div', { class: 'row gap' },
       h('button', { class: 'btn', onclick: () => { U.sel = addDays(U.sel, -1); U.month = U.sel.slice(0, 7); rerender(); } }, '‹'),
@@ -109,11 +117,16 @@ Views.almanax = (main, dateArg) => {
       h('div', { class: 'alm-bonus' }, h('div', { class: 'muted sm' }, 'Bonus — ' + a.bt), h('p', null, a.b),
         h('div', { class: 'kpis' }, h('div', { class: 'kpi' }, h('i', null, 'Kamas'), h('b', null, fmt(a.k))), h('div', { class: 'kpi' }, h('i', null, 'Ratio XP'), h('b', null, '×' + a.x)), h('div', { class: 'kpi' }, h('i', null, 'Niv. optimal'), h('b', null, a.ol))))));
     const chk = h('div', { class: 'alm-chk' }, h('h4', null, 'Offrande faite'));
-    if (st.persos.length) st.persos.forEach((p) => chk.appendChild(h('label', { class: 'chk big' }, h('input', { type: 'checkbox', checked: almDone(p.id, U.sel), onchange: () => { almToggle(p.id, U.sel); rerender(); } }), p.nom)));
+    if (st.persos.length) st.persos.forEach((p) => chk.appendChild(h('label', { class: 'chk big' }, h('input', { type: 'checkbox', checked: almDone(p.id, U.sel), onchange: () => { almToggle(p.id, U.sel); rerender(); } }), p.nom, h('small', { class: 'muted' }, ' · 📖 ' + pagesOf(p.id)))));
     chk.appendChild(h('label', { class: 'chk big' }, h('input', { type: 'checkbox', checked: almDone('all', U.sel), onchange: () => { almToggle('all', U.sel); rerender(); } }), st.persos.length ? 'Toute l\'équipe' : 'Fait'));
     hero.appendChild(chk);
   }
   main.appendChild(hero);
+  if (st.persos.length) main.appendChild(h('div', { class: 'card alm-pages' }, h('h3', null, '📖 Pages de journal'),
+    h('p', { class: 'muted sm' }, 'Une page par offrande faite. À 365 pages, tu débloques le Dofus Dolmanax.'),
+    h('div', { class: 'kpis' }, st.persos.map((p) => { const n = pagesOf(p.id); const sr = streakOf(p.id);
+      return h('div', { class: 'kpi' }, h('i', null, p.nom), h('b', null, n + ' / 365'), progress(Math.min(100, n / 365 * 100)),
+        h('small', { class: 'muted' }, (n >= 365 ? 'Dolmanax débloqué !' : 'encore ' + (365 - n)) + (sr > 1 ? ' · ' + sr + ' j de suite' : ''))); }))));
 
   const two = h('div', { class: 'two' });
   // calendrier mensuel
@@ -155,20 +168,4 @@ Views.almanax = (main, dateArg) => {
       h('b', null, dateLong(x.d)), h('span', { class: 'muted' }, x.q + '× ' + x.on))));
   } });
   main.appendChild(h('div', { class: 'card' }, h('h3', null, 'Rechercher une offrande'), sr, res));
-
-  // stats de série
-  if (st.persos.length) {
-    let streakHtml = st.persos.map((p) => {
-      let n = 0; let d = today; if (!almDone(p.id, d) && !almDone('all', d)) d = addDays(d, -1);
-      while (almDone(p.id, d) || almDone('all', d)) { n++; d = addDays(d, -1); if (n > 400) break; }
-      return h('div', { class: 'kpi' }, h('i', null, p.nom), h('b', null, n + ' j de suite'));
-    });
-    main.appendChild(h('div', { class: 'card' }, h('h3', null, 'Séries d\'offrandes'), h('div', { class: 'kpis' }, streakHtml)));
-    /* pages de journal : 1 page par offrande faite ; 365 pour le Dolmanax */
-    const dates = new Set(Object.keys(st.almanax.fait).map((k) => k.split('|')[1]));
-    const pages = (pid) => [...dates].filter((d) => almDone(pid, d) || almDone('all', d)).length;
-    main.appendChild(h('div', { class: 'card' }, h('h3', null, '📖 Pages de journal'),
-      h('p', { class: 'muted sm' }, '1 page par offrande faite (cochée ci-dessus) · 365 pages pour le Dofus Dolmanax.'),
-      h('div', { class: 'kpis' }, st.persos.map((p) => { const n = pages(p.id); return h('div', { class: 'kpi' }, h('i', null, p.nom), h('b', null, n + ' / 365'), progress(Math.min(100, n / 365 * 100)), h('small', { class: 'muted' }, n >= 365 ? 'Dolmanax débloqué !' : 'encore ' + (365 - n))); }))));
-  }
 };

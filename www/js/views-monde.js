@@ -180,8 +180,7 @@ Views.accueil = (main) => {
   const alm = h('a', { class: 'card dcard', href: '#/almanax' }, h('h3', null, '📅 Almanax du jour'), h('div', { class: 'muted sm', style: { marginBottom: '8px', textTransform: 'capitalize' } }, dateLong(today)));
   if (a) { const it = IB.get(a.o); alm.appendChild(h('div', { class: 'row gap' }, it ? itemImg(it, 'big') : null, h('div', null, h('b', null, a.q + '× ' + a.on), h('div', { class: 'muted sm' }, a.bt))));
     alm.appendChild(h('p', { class: 'clamp' }, a.b));
-    const done = st.persos.filter((p) => almDone(p.id, today) || almDone('all', today)).length;
-    alm.appendChild(h('div', { class: 'muted sm' }, st.persos.length ? done + ' / ' + st.persos.length + ' perso(s) ont fait l\'offrande' : 'Aucun perso créé')); }
+    alm.appendChild(h('div', { class: 'alm-quick' }, h('span', { class: 'muted sm' }, 'Offrande faite :'), st.persos.map((p) => h('button', { class: 'gchip' + (almDone(p.id, today) || almDone('all', today) ? ' on' : ''), onclick: (e) => { e.preventDefault(); e.stopPropagation(); if (almDone('all', today)) { toast('Déjà cochée pour toute l\'équipe — décoche-la dans Almanax', 'warn'); return; } almToggle(p.id, today); rerender(); } }, p.nom)))); }
   else alm.appendChild(h('p', { class: 'muted' }, 'Pas de donnée pour aujourd\'hui.'));
   grid.appendChild(alm);
   if (contCard) grid.appendChild(contCard);
@@ -190,11 +189,6 @@ Views.accueil = (main) => {
   if (st.persos.length) st.persos.forEach((p) => { const n = ocreCount(p.id); oc.appendChild(h('div', { class: 'orow' }, h('span', null, p.nom), progress(n / ARCHI.length * 100), h('b', null, n + '/' + ARCHI.length))); });
   else oc.appendChild(h('p', { class: 'muted' }, 'Crée un personnage pour commencer.'));
   grid.appendChild(oc);
-  // persos
-  const pc = h('div', { class: 'card dcard' }, h('h3', null, '⚔️ Mes personnages'));
-  if (st.persos.length) st.persos.slice(0, 6).forEach((p) => { const c = buildCost(curBuild(p)); pc.appendChild(h('a', { class: 'orow link', href: '#/perso/' + p.id }, h('span', null, (CLASS_ICON[className(p.classe)] || '') + ' ' + p.nom), h('span', { class: 'muted sm' }, 'niv. ' + p.niveau), h('b', null, kam(c.mkt)))); });
-  else pc.appendChild(h('div', null, h('p', { class: 'muted' }, 'Aucun personnage.'), h('button', { class: 'btn primary', onclick: () => go('persos') }, 'Commencer')));
-  grid.appendChild(pc);
   // guides
   if (window.GuidesAPI) {
     const rows = GuidesAPI.rows();
@@ -205,15 +199,7 @@ Views.accueil = (main) => {
     } else gc.appendChild(h('p', { class: 'muted' }, 'Crée un personnage pour suivre un guide.'));
     grid.appendChild(gc);
   }
-  // craft
-  const cr = h('a', { class: 'card dcard', href: '#/craft' }, h('h3', null, '🔨 Liste de craft'), h('div', { class: 'bignum' }, st.craft.liste.length), h('div', { class: 'muted' }, 'objet(s) à fabriquer'));
-  grid.appendChild(cr);
-  // compta
-  const tot = st.persos.reduce((acc, p) => { p.builds.forEach((b) => { const c = buildCost(b); acc.mkt += c.mkt; acc.paid += c.paid; acc.loss += c.loss; }); return acc; }, { mkt: 0, paid: 0, loss: 0 });
-  grid.appendChild(h('a', { class: 'card dcard', href: '#/compta' }, h('h3', null, '💰 Compta'), h('div', { class: 'bignum' }, kam(tot.mkt)), h('div', { class: 'muted' }, 'valeur des stuffs · payé ' + kam(tot.paid))));
-  grid.appendChild(h('a', { class: 'card dcard', href: '#/carte' }, h('h3', null, '🗺️ Carte & ressources'), h('p', { class: 'muted' }, MONDE.subs.length + ' zones, ' + HARV.size + ' ressources localisées. Cherche où récolter ce qu\'il te faut.')));
   main.appendChild(grid);
-  main.appendChild(h('div', { class: 'quick' }, [['metiers', '⛏️ Atelier métiers'], ['craft', '🔨 Atelier de craft'], ['persos', '✨ Générateur de build']].map(([k, n]) => h('a', { class: 'btn', href: '#/' + k }, n))));
 };
 
 /* ---------------- sauvegarde ---------------- */
@@ -228,20 +214,15 @@ Views.params = (main) => {
       list.map((c) => h('button', { class: 'th-sw' + (val.toLowerCase() === c ? ' on' : ''), style: { background: c }, title: c, onclick: () => setTh({ [key]: c }) })),
       h('label', { class: 'th-pick', title: 'Couleur personnalisée' }, h('input', { type: 'color', class: 'th-col', value: val, oninput: (e) => { TH[key] = e.target.value; applyTheme(TH); touch(); }, onchange: () => rerender() }), h('span', null, 'Personnalisée')),
       h('button', { class: 'btn sm', onclick: () => setTh({ [key]: null }) }, 'Réinitialiser')));
-  main.appendChild(h('div', { class: 'card' }, h('h3', null, '🎨 Apparence'),
+  const themeCard = (h('div', { class: 'card' }, h('h3', null, '🎨 Apparence'),
     h('h4', null, 'Ambiances'),
-    h('p', { class: 'muted sm' }, 'Une ambiance règle d\'un coup le fond et les deux couleurs qui ressortent. Tu peux ensuite ajuster chacune ci-dessous.'),
+    h('p', { class: 'muted sm' }, 'Choisis une ambiance : elle règle le fond et les couleurs d\'un coup.'),
     h('div', { class: 'th-grid' }, Object.keys(THEMES).map((k) => { const T = THEMES[k], V = themeVars({ preset: k }); return h('button', { class: 'th-card' + (TH.preset === k && !TH.bg && !TH.accent && !TH.accent2 ? ' on' : ''), onclick: () => setTh({ preset: k, bg: null, accent: null, accent2: null }) },
       h('div', { class: 'th-prev', style: { background: V.bg } }, h('i', { style: { background: V.nav1 } }), h('i', { style: { background: V.panel } }), h('i', { style: { background: V.gold } }), h('i', { style: { background: V.violet } })), T.n); })),
+    h('details', { class: 'th-more' }, h('summary', null, 'Personnaliser les couleurs'),
     pick('Couleur de fond', 'Le fond de l\'appli : toutes les surfaces (cartes, menus, champs) s\'adaptent automatiquement, en sombre comme en clair.', BGS, 'bg', TH.bg || base.bg),
     pick('Couleur qui ressort', 'Titres, boutons principaux, éléments actifs, barres de progression.', ACCENTS, 'accent', TH.accent || base.accent),
-    pick('Couleur secondaire', 'Lueurs d\'ambiance, onglets, cadres de mise en avant.', ACCENTS, 'accent2', TH.accent2 || base.accent2)));
-  if (window.Profiles) main.appendChild(h('div', { class: 'card' }, h('h3', null, '💾 Sauvegarde des profils'),
-    h('p', { class: 'muted' }, 'Chaque profil s\'exporte dans son propre fichier (persos, guides cochés, craft, métiers, suivis). Importer un fichier ajoute un nouveau profil : rien n\'est écrasé.'),
-    h('div', { class: 'row gap wrap' },
-      h('button', { class: 'btn primary', onclick: () => Profiles.exportProfile(S().pid) }, '⬇ Exporter le profil « ' + Profiles.cur().name + ' »'),
-      h('button', { class: 'btn', onclick: () => S().profiles.forEach((p, i) => setTimeout(() => Profiles.exportProfile(p.id), i * 400)) }, '⬇ Exporter tous les profils'),
-      h('button', { class: 'btn', onclick: () => Profiles.pickFile((o) => Profiles.importProfile(o)) }, '⬆ Importer un profil'))));
+    pick('Couleur secondaire', 'Lueurs d\'ambiance, onglets, cadres de mise en avant.', ACCENTS, 'accent2', TH.accent2 || base.accent2))));
   if (window.AtelierSync) {
     const SY = window.AtelierSync; const cfg = SY.get();
     const syncCard = h('div', { class: 'card' }, h('h3', null, '☁ Synchronisation entre appareils'));
@@ -285,12 +266,13 @@ Views.params = (main) => {
     }
     main.appendChild(syncCard);
   }
-  main.appendChild(h('div', { class: 'card' }, h('h3', null, 'Sauvegarde complète'),
-    h('p', { class: 'muted' }, 'Tes données sont enregistrées automatiquement et synchronisées entre tes appareils (un fichier par profil). Ici, une copie de TOUS les profils en un seul fichier.'),
+  main.appendChild(h('div', { class: 'card' }, h('h3', null, '💾 Sauvegarde'),
+    h('p', { class: 'muted' }, 'Tes données sont enregistrées automatiquement. Ici, tu peux en garder une copie dans un fichier, ou en importer une.'),
     h('div', { class: 'row gap wrap' },
       h('button', { class: 'btn primary', onclick: async () => { downloadFile('atelier-dofus-' + todayStr() + '.json', await st.exportAll()); } }, '⬇ Exporter tout'),
-      h('label', { class: 'btn' }, '⬆ Importer tout', h('input', { type: 'file', accept: '.json', style: { display: 'none' }, onchange: (e) => { const f = e.target.files[0]; if (!f) return; f.text().then((t) => { try { const o = JSON.parse(t); if (o && o.kind === 'atelier-profil') { Profiles.importProfile(o); return; } confirmBox('Remplacer TOUTES tes données (tous les profils) par ce fichier ?', async () => { try { await st.importAll(t); toast('Sauvegarde importée'); rerender(); Profiles.refresh(); } catch (er) { toast('Fichier invalide', 'warn'); } }, 'Remplacer'); } catch (er) { toast('Fichier invalide', 'warn'); } }); } })),
+      h('label', { class: 'btn' }, '⬆ Importer une sauvegarde', h('input', { type: 'file', accept: '.json', style: { display: 'none' }, onchange: (e) => { const f = e.target.files[0]; if (!f) return; f.text().then((t) => { try { const o = JSON.parse(t); if (o && o.kind === 'atelier-profil') { Profiles.importProfile(o); return; } confirmBox('Remplacer TOUTES tes données (tous les profils) par ce fichier ?', async () => { try { await st.importAll(t); toast('Sauvegarde importée'); rerender(); Profiles.refresh(); } catch (er) { toast('Fichier invalide', 'warn'); } }, 'Remplacer'); } catch (er) { toast('Fichier invalide', 'warn'); } }); } })),
       h('button', { class: 'btn danger', onclick: () => confirmBox('Effacer toutes les données du profil « ' + Profiles.cur().name + ' » (persos, builds, guides cochés…) ? Pense à l\'exporter avant.', () => { st.loadData(st.state, { data: {}, sel: {} }); touch(); rerender(); Profiles.refresh(); }, 'Effacer ce profil') }, 'Réinitialiser ce profil'))));
+  main.appendChild(themeCard);
   main.appendChild(h('div', { class: 'card' }, h('h3', null, 'Données & crédits'),
     h('p', null, 'Données du jeu : version ' + META.version + ' (fichiers publics extraits du client, publiés par le projet dofusdude/dofus3-main). Les noms, images et données de Dofus sont la propriété d\'Ankama Games ; cet outil est un projet personnel non officiel, sans lien avec Ankama.'),
     h('ul', null, h('li', null, 'Les dégâts sont calculés avec la formule classique de Dofus (estimation).'),
