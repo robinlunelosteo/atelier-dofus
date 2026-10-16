@@ -100,16 +100,26 @@
     });
   }
   const copy = (t) => { const done = () => toast('Copié : ' + t); try { navigator.clipboard.writeText(t).then(done).catch(() => done()); } catch (e) { done(); } };
-  const mkPos = (x, y) => h('button', { class: 'gpos', title: 'Copier /travel ' + x + ',' + y + ' (clic) — voir sur la carte (Maj+clic)', onclick: (e) => { if (e.shiftKey) { Views._carte = Views._carte || { wm: 1 }; Views._carte.wm = 1; Views._carte.goto = [+x, +y]; location.hash = '#/carte'; } else copy('/travel ' + x + ',' + y); } }, '📍 ' + x + ', ' + y);
+  /* commande à copier : /travel seul, ou /zaap puis /travel quand le guide indique un zaap */
+  const posCmd = (o) => !o.z ? '/travel ' + o.x + ',' + o.y : (o.z[0] === +o.x && o.z[1] === +o.y) ? '/zaap ' + o.z[0] + ',' + o.z[1] : '/zaap ' + o.z[0] + ',' + o.z[1] + ' ; /travel ' + o.x + ',' + o.y;
+  const posLabel = (o) => '📍 ' + o.x + ', ' + o.y + (o.z ? ' · zaap ' + o.z[0] + ',' + o.z[1] : '');
+  const mkPos = (o, noMap) => { const b = h('button', { class: 'gpos', onclick: (e) => { e.stopPropagation(); if (e.shiftKey && !noMap) { Views._carte = Views._carte || { wm: 1 }; Views._carte.wm = 1; Views._carte.goto = [+o.x, +o.y]; location.hash = '#/carte'; } else copy(posCmd(o)); } });
+    b.refresh = () => { b.textContent = posLabel(o); b.title = 'Copier ' + posCmd(o) + ' (clic) — voir sur la carte (Maj+clic)'; }; b.refresh(); return b; };
+  const POS_RE = /\[(zaap:)?(-?\d+), ?(-?\d+)\]/g;
   function posify(root) {
-    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT); const list = []; let n; while ((n = w.nextNode())) if (/\[-?\d+, ?-?\d+\]/.test(n.nodeValue)) list.push(n);
+    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT); const list = []; let n; while ((n = w.nextNode())) if (/\[(zaap:)?-?\d+, ?-?\d+\]/.test(n.nodeValue)) list.push(n);
+    let last = null; // dernière position rencontrée : un [zaap:x,y] qui la suit lui est rattaché
     list.forEach((t) => {
-      const frag = document.createDocumentFragment(); let last = 0; const s = t.nodeValue;
-      s.replace(/\[(-?\d+), ?(-?\d+)\]/g, (m, x, y, off) => { frag.appendChild(document.createTextNode(s.slice(last, off))); last = off + m.length;
-        frag.appendChild(mkPos(x, y)); return m; });
-      frag.appendChild(document.createTextNode(s.slice(last))); t.parentNode.replaceChild(frag, t);
+      const frag = document.createDocumentFragment(); let pos0 = 0; const s = t.nodeValue;
+      s.replace(POS_RE, (m, zp, x, y, off) => { frag.appendChild(document.createTextNode(s.slice(pos0, off))); pos0 = off + m.length;
+        if (zp) { if (last) { last.o.z = [+x, +y]; last.b.refresh(); } else frag.appendChild(document.createTextNode(m)); }
+        else { const o = { x, y, z: null }; const b = mkPos(o); last = { o, b }; frag.appendChild(b); }
+        return m; });
+      frag.appendChild(document.createTextNode(s.slice(pos0))); t.parentNode.replaceChild(frag, t);
     });
   }
+  /* positions d'un texte brut, avec leur éventuel zaap */
+  function parsePos(txt) { const out = []; for (const m of txt.matchAll(POS_RE)) { if (m[1]) { if (out.length) out[out.length - 1].z = [+m[2], +m[3]]; } else out.push({ x: +m[2], y: +m[3], z: null }); } return out; }
   function renderStep(gu, i) {
     const st = gu.steps[i]; const doc = new DOMParser().parseFromString('<div>' + (st.h || '<p><i>(étape vide)</i></p>') + '</div>', 'text/html'); const box = doc.body.firstChild;
     clean(box);
@@ -279,14 +289,14 @@
     if (!ids.length) { main.appendChild(h('div', { class: 'card empty' }, h('p', null, 'Aucun guide suivi. Dans la bibliothèque, clique « Suivre » sur les guides à avancer en parallèle.'))); return; }
     const plan = [];
     ids.forEach((gid) => { const gu = LIB.get(gid); const i = firstTodo(gid); const st = gu.steps[i]; const txt = (new DOMParser().parseFromString(st.h, 'text/html').body.textContent || '').replace(/\s+/g, ' ').trim();
-      const pos = [...txt.matchAll(/\[(-?\d+), ?(-?\d+)\]/g)].map((m) => [+m[1], +m[2]]); plan.push({ gu, i, txt, pos }); });
+      const pos = parsePos(txt); plan.push({ gu, i, txt, pos }); });
     // ordre de parcours : plus proche voisin à partir de la première position
     const withPos = plan.filter((p) => p.pos.length), noPos = plan.filter((p) => !p.pos.length); const order = [];
-    if (withPos.length) { let cur = withPos.shift(); order.push(cur); while (withPos.length) { const [cx, cy] = cur.pos[cur.pos.length - 1]; withPos.sort((a, b) => (Math.abs(a.pos[0][0] - cx) + Math.abs(a.pos[0][1] - cy)) - (Math.abs(b.pos[0][0] - cx) + Math.abs(b.pos[0][1] - cy))); cur = withPos.shift(); order.push(cur); } }
+    if (withPos.length) { let cur = withPos.shift(); order.push(cur); while (withPos.length) { const { x: cx, y: cy } = cur.pos[cur.pos.length - 1]; withPos.sort((a, b) => (Math.abs(a.pos[0].x - cx) + Math.abs(a.pos[0].y - cy)) - (Math.abs(b.pos[0].x - cx) + Math.abs(b.pos[0].y - cy))); cur = withPos.shift(); order.push(cur); } }
     const all = order.concat(noPos);
     main.appendChild(h('div', { class: 'card' }, h('h3', null, '🧭 Prochaine étape de chaque guide suivi'), h('p', { class: 'muted sm' }, 'Classées pour enchaîner les positions proches. Clique pour ouvrir l\'étape.'),
       all.map((p, k) => h('div', { class: 'gnext', onclick: () => { U().open = p.gu.id; G().cur[p.gu.id] = p.i; rerender(); } }, h('b', null, (k + 1) + '. ' + p.gu.name), h('small', { class: 'muted' }, ' — étape ' + (p.i + 1) + '/' + p.gu.n),
-        h('div', { class: 'gn-txt' }, p.txt.slice(0, 180) + (p.txt.length > 180 ? '…' : '')), p.pos.length ? h('div', null, p.pos.slice(0, 6).map(([x, y]) => h('button', { class: 'gpos', onclick: (e) => { e.stopPropagation(); copy('/travel ' + x + ',' + y); } }, '📍 ' + x + ',' + y))) : null))));
+        h('div', { class: 'gn-txt' }, p.txt.slice(0, 180) + (p.txt.length > 180 ? '…' : '')), p.pos.length ? h('div', null, p.pos.slice(0, 6).map((o) => mkPos(o, true))) : null))));
     ids.forEach((gid) => { const gu = LIB.get(gid); main.appendChild(h('div', { class: 'card' }, h('b', null, gu.name), bars(gu))); });
   }
 
