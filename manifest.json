@@ -1,6 +1,6 @@
 {
-"version": "1.3.1",
-"notes": "Nouveau : synchronisation de ta progression entre appareils (Paramètres > Synchronisation).",
+"version": "1.3.2",
+"notes": "Nouveau : tous les guides Ganymède sont maintenant inclus (98 guides), les 11 déjà présents sont mis à jour.",
 "files": {
 "css/carte2.css": {
 "h": "3601dfdbba0cf796f08c50867e8b16738e34d1c126cca626dddfe0d70626ac85",
@@ -43,52 +43,400 @@
 "s": 245498
 },
 "data/guides-index.js": {
-"h": "98f7f516ff64665a59d67bca1ba8e7f25f9c606b22fd446bf4483e6642df0458",
-"s": 1742
+"h": "5dbdd0a77e20f9ed556a37052c450067b7bac82f70fb88791abd9fe56b77eb09",
+"s": 15371
+},
+"data/guides/104.js": {
+"h": "705958592d55325ba4d32d81b21db0ce77deaf148171c1c79f36a89ee7a79791",
+"s": 97569
+},
+"data/guides/1074.js": {
+"h": "79fd4c21c7c4477df34b17b4e26127a1e7ddf2e57f413b7ef3021ea7b44230dd",
+"s": 28066
+},
+"data/guides/112.js": {
+"h": "3d408c93632de41c356f014e9222c04c1cf6b0e123fb6b0c5fe4cb14c165ef36",
+"s": 230208
+},
+"data/guides/113.js": {
+"h": "ee2c48ab70a87c1dfed60fe5782877d50e83ab8caf7041f300f503b6a5362c36",
+"s": 223548
+},
+"data/guides/1138.js": {
+"h": "ec7f58f702d1a071bea28ee7c216d1dd076664a0fa0dd85deb8163ee5c68eaaf",
+"s": 80675
+},
+"data/guides/1140.js": {
+"h": "1219812ba8ada672b947203b7911c1f9a05720d674916b5b1f69b4d5a54f5151",
+"s": 60126
+},
+"data/guides/1237.js": {
+"h": "33e9f658721c066356c99701aff8b80edcb021f41384d4b84aaf77bf607b2074",
+"s": 131535
+},
+"data/guides/131.js": {
+"h": "7a645bedb288be00c4261e60fb5d38db96ac479fa5a0ff94de5dac469ca4c95b",
+"s": 204650
+},
+"data/guides/1551.js": {
+"h": "c40c4998a6211e564b6f011ca673fe8619fdafe85edefd98f7e2c0345163380b",
+"s": 326345
+},
+"data/guides/1714.js": {
+"h": "d8baaee65deadb02674da7408425517ce78c668c14f14137515901fd8736d68d",
+"s": 253614
+},
+"data/guides/1729.js": {
+"h": "c647a1fa3033b6835e607e1b026ae78f78d4680d1964c83636ab74940a9df7af",
+"s": 413885
+},
+"data/guides/1755.js": {
+"h": "493930e69d2979efdbae5cdad3dccfd043bc58c03aaf95dab3cead2763356e2a",
+"s": 261738
+},
+"data/guides/182.js": {
+"h": "25a8cbefd759cd69b5ca61d3be9ec860210d6297d4c01c974377d1388a3eb872",
+"s": 216220
 },
 "data/guides/183.js": {
-"h": "21d4b2dc818a973b11d99fd81f7aaac064227bb191ad801e5561c43cc35d476e",
-"s": 28314
+"h": "72a706d4d70ced2d7f95bfc090032808365dd56fc3397df4dbf120fec76eaf79",
+"s": 28169
+},
+"data/guides/186.js": {
+"h": "69efab8152f4d79adfaf624b817ac584ffb10926f1075c7f8ecabcf2d3d2b9d9",
+"s": 14021
+},
+"data/guides/1867.js": {
+"h": "1530e5df9722b1616691b31001228a099a2b41c45e402c2db0ea9530d9188280",
+"s": 187963
+},
+"data/guides/189.js": {
+"h": "22778b9ef979657555e2e3e3a6ba13168c5e2ef44190d7ef05c140fb378a848f",
+"s": 111094
+},
+"data/guides/1891.js": {
+"h": "b3f70cec35a72d51e66b2ce4043b19b0e2e5d723bfac31334bcde24f2a091b8e",
+"s": 133988
+},
+"data/guides/1892.js": {
+"h": "a98b99f0522691aebbfdd1ea74120bf805e995f9501edf3d3bc9ffdf9a728fbc",
+"s": 29783
+},
+"data/guides/1900.js": {
+"h": "1e62126b125975a5fa03c016c7e2ce87dca4ddccd5dc8ec2f0cc6866dc5eaf5c",
+"s": 49878
+},
+"data/guides/1914.js": {
+"h": "3a2e5edbebdfa31cc3b54e066eaf21bb1e417044dd1f6d074e9ad735958ad158",
+"s": 115597
+},
+"data/guides/1954.js": {
+"h": "b2ba90b3d898df3f52ced54da092d14bdc60b25cd237c49142559efa60951adc",
+"s": 122563
 },
 "data/guides/2.js": {
-"h": "210beb39e605233aa5870fa79d9609e958f055904581aeee9486cbaf1a8ba117",
-"s": 389434
+"h": "510dbc95f92ad50272f828b1629449ca3fcdf8f265b892f6cc7e0c9ecf09f1d0",
+"s": 388155
+},
+"data/guides/2007.js": {
+"h": "4f4b06c8970d7b83b948d9f27e614ddd3867411b64e6ffbbc6d5339ff3c87a63",
+"s": 111828
+},
+"data/guides/2009.js": {
+"h": "09493b85d205c9dc6bf312b9668ded42d82603db6156bf462d5c7ad050282f39",
+"s": 60745
+},
+"data/guides/2010.js": {
+"h": "755e4d35526cc6a6d9a2f7af53d48c7a831a5f70cd4d31c74a0f91a3a8f7203d",
+"s": 76250
+},
+"data/guides/2011.js": {
+"h": "e74ad2794fca4add047976b4e05ef585e57de9149a2a14a359bc20d34b5549f0",
+"s": 88065
+},
+"data/guides/2017.js": {
+"h": "81e54bb04182be940ced4713d703a389c4614a961718379df3c09141bef59af8",
+"s": 177333
+},
+"data/guides/2022.js": {
+"h": "72dd856b61dca56ecbdb48ef013f17dea35db52b7f7a7bb8cd20b1f3323bead1",
+"s": 93367
+},
+"data/guides/2023.js": {
+"h": "94096830264320469b78e066bc102b26f7671bb0a0dd29b8c3618a2204d0b435",
+"s": 163319
+},
+"data/guides/2024.js": {
+"h": "d7b48a063c161bd1816aaca118a6844475132668aab5dd5a8a73ef1c6d5e3ebd",
+"s": 68635
+},
+"data/guides/2025.js": {
+"h": "0ec67e4e959a7facdebceb7ed4797966cd519b3e43f6a11aa23afbd9f07b07ef",
+"s": 10014
+},
+"data/guides/2026.js": {
+"h": "643718931cb3c13b15a3f674cf97a5275228549e6fa39195b2cc300cc74cdafa",
+"s": 207426
+},
+"data/guides/2029.js": {
+"h": "3e4d70d24f4f062b2a82a0425a215091b3c150a4f35a5a22bed772652ef6d867",
+"s": 298268
+},
+"data/guides/2035.js": {
+"h": "fadc6093e062c8b0760cc7d166b1b56b7684f574f551ec925c8485becd95b026",
+"s": 167967
+},
+"data/guides/2042.js": {
+"h": "8ddd59fe7110876e8d1c499bdeeb927ae039e4e123b20378b66254379560cdf3",
+"s": 300163
+},
+"data/guides/2043.js": {
+"h": "dd33555aad07687e09e100119b048c8a54b888cc82954c96a8e9999dc7d68e9d",
+"s": 3741
+},
+"data/guides/2044.js": {
+"h": "320d07a26e5af06c10cbf871b7ba545bdbfc9dec7e59ca531a2d03415d3a8613",
+"s": 87936
+},
+"data/guides/2045.js": {
+"h": "dc90ddd1e25cc3cb97ad93df3411add7c6c309a8fca87182da234aacad894041",
+"s": 157747
+},
+"data/guides/2047.js": {
+"h": "b5a4d50e6dc53c7579837360ccd7723ff99b0bce4e24e03c7b7d4484a2b848ad",
+"s": 151417
+},
+"data/guides/2050.js": {
+"h": "d00460c9daee9bea1856abfdb930361eb20eb58e583080f1812d954efee65cfa",
+"s": 355585
+},
+"data/guides/24.js": {
+"h": "5e0c004d02d89e423ac5e0b5c48d747eda3fe9c8573278e77edf3615c6ec3d30",
+"s": 133283
 },
 "data/guides/25.js": {
-"h": "09685339fe676996314658761ad5c5afc6bae86d415738a56cd5f8cc23b85575",
-"s": 42735
+"h": "50efb2e7c6c314045a2aa800786632925a7270482d9d2c1d079ba531923aaae9",
+"s": 42434
+},
+"data/guides/2612.js": {
+"h": "66611b925a2d0a5f2c3914dd0bd0d4fec39b21acff54d94394a99098fd785aa3",
+"s": 346632
+},
+"data/guides/2673.js": {
+"h": "7d106c0c11350725e37693566a41f50ac3f64ee3a5f5063ed408409a327f0fcf",
+"s": 267537
+},
+"data/guides/2680.js": {
+"h": "1415edf3b67f0eee50e82fea91ed057e9bd3996c51923e9e1ef756666b6e2183",
+"s": 279485
 },
 "data/guides/2747.js": {
-"h": "c1be0d5424bbe28ad62bec1636a11e972de7c3ace9c66845b7dde5fff44336aa",
-"s": 691820
+"h": "1d8957d68441d9dca896258880028da7633abbdbc59c127ae12be529a9f2bbe8",
+"s": 692395
 },
 "data/guides/28.js": {
-"h": "37f105f65db1c958320e7dfd7d72b351635d252d90c2ae77d82043d52cf41c6c",
-"s": 94700
+"h": "1d8444fde9bc8831d70ce78c4d76da22ba8ebe6a91d58f1833bfb14f71f9f9f4",
+"s": 94359
+},
+"data/guides/291.js": {
+"h": "7b88ea2a00116f0be11c0b5318192379e6d9b16badbf2738c014e8e64f659f6d",
+"s": 112997
 },
 "data/guides/3.js": {
-"h": "319159fbf22bbf3841c2fc270bec59953f89a8bc4fd3758ec493eed8f3c98931",
-"s": 59373
+"h": "1851304ddc264a13a28fe7a248d102a4e43c0f5fdfbb088df9f56eb4b50c9d54",
+"s": 59233
+},
+"data/guides/30.js": {
+"h": "b81704609ec2807aeb1f39fa371f35c8d125d57689e5319d3da0c000e0bc50ca",
+"s": 89586
+},
+"data/guides/305.js": {
+"h": "3cbbbbd803f12320ef20c777b8a5ffdbb81efce15eda9373d215e46a288c92ea",
+"s": 99583
 },
 "data/guides/306.js": {
-"h": "c3c79a69e92b662b618d814b4d983ba293f48af9bb98d33d16c6e3498e21e992",
-"s": 59980
+"h": "ccf8ff37b62540eaa73fa845ee9eb9b74f80019319c9ec814fc69bb0610cd97a",
+"s": 59704
+},
+"data/guides/307.js": {
+"h": "cda01bc7eaac8b1871b27f331c21d0ea4692f4537ab126b3d49ff7fb1617f3d4",
+"s": 106761
+},
+"data/guides/308.js": {
+"h": "5db56778ad430336753b6702d89e262f53bf6196376b7bebff38bbfe225eb44e",
+"s": 108433
+},
+"data/guides/309.js": {
+"h": "d5b8616a8d3e882081ff2668b71a1216212d68e684518113bfaebf01e367de73",
+"s": 33437
 },
 "data/guides/310.js": {
-"h": "30b7c6dca2cdc8bc112fa1ec1c361782200d8ed70964bd0d05572815168a4324",
-"s": 86359
+"h": "482d8e5b75874016a2de07cfb9b5383be2539f0d916a467eadd72b83266a53c5",
+"s": 86044
+},
+"data/guides/3238.js": {
+"h": "1c85bf08953204a5868256f3886a0f2e3c569be4d38cf09690f8aabd67322501",
+"s": 743285
+},
+"data/guides/354.js": {
+"h": "61f78c2a458a330a9722cc806cf67bbeb2b3ebf53b210d85716383ed3eab845c",
+"s": 100325
 },
 "data/guides/374.js": {
-"h": "06980662898749e6036d9eb69306c861f40347ba63b6437ef9c749d6b792030c",
-"s": 111756
+"h": "c0e41b70789a0d4e45cb6dd1763573f269b73c2f5b20de2b5a0cb09537e7a0ce",
+"s": 111216
+},
+"data/guides/3749.js": {
+"h": "e09990eba5c7161a32ccce185d398f65e20543481fb0fdf6f4238b7db19e7528",
+"s": 227810
+},
+"data/guides/375.js": {
+"h": "6f9740dd3ddd59c06f753ac366a56aa70fa59a823b979dcd3c74995a9dd1bf82",
+"s": 173754
+},
+"data/guides/426.js": {
+"h": "252e38b35bfe6254ca8449754f6d9eb24f720d1cb9db9ca2c991d20820a24cc1",
+"s": 103885
+},
+"data/guides/427.js": {
+"h": "2b5f68f18f5ccd9e5dd339dc933eaf05360985f44cd4a93c33b04905c8630243",
+"s": 210438
+},
+"data/guides/428.js": {
+"h": "9ea9f160de8bc161680bdff3ac3dcb381770821622ba43260747d4db73f69262",
+"s": 465913
+},
+"data/guides/429.js": {
+"h": "7da0b04d2df0bd7f40c7949d14e0a43342fc6e7b29b61f030087ed54c7427040",
+"s": 54201
+},
+"data/guides/430.js": {
+"h": "3aeff3bba25651d729e22fc7bc8c7d992c78316b9db440474c96c5349604fce1",
+"s": 125344
+},
+"data/guides/431.js": {
+"h": "b937f8ce3b7c0d11f044ca37999db1a77f48af720920053ba706d63e1de21cba",
+"s": 62811
+},
+"data/guides/432.js": {
+"h": "acdf92a31ce3000d69660e99da92e71b8e9c0424ca2b449b9ca379f5daaef0ed",
+"s": 89489
+},
+"data/guides/433.js": {
+"h": "30404bfc326aed6a7e24825345a3d5b75a238032e9b6c67104b5f3ee0df7e38d",
+"s": 160560
+},
+"data/guides/434.js": {
+"h": "7918179ff7e273d687c34de6277654706627625ffd1a9e920187ea54293c59cf",
+"s": 71267
+},
+"data/guides/435.js": {
+"h": "07b76864780a78080a9bdbe710cfa0aa3ff8a0263512d558f044c2d625a57f7c",
+"s": 142592
+},
+"data/guides/440.js": {
+"h": "153ee83b23a7bf91bb5a03a379e5cbf11a2089961a8d3841524f3b531416ee22",
+"s": 51484
+},
+"data/guides/479.js": {
+"h": "395f4c195c3b8c231ab52b71f2f0ad0708a44e1fc6acae11940ae4922b80547f",
+"s": 193745
+},
+"data/guides/480.js": {
+"h": "179cbf9e69944519d80cb41c04d6af35d9294909c6d6507a76e6e0e37ef391d4",
+"s": 61799
+},
+"data/guides/481.js": {
+"h": "8625482213360fdf13dddc28bb4d9f99d5fa6680ce58474210475713e6b74b08",
+"s": 148771
+},
+"data/guides/482.js": {
+"h": "6e79ee2317ed2147cca5f0f254a8376c42026a5d4c393ced97c3b10ae6e9b5d7",
+"s": 182698
+},
+"data/guides/483.js": {
+"h": "ce87cf1bff5ebfaaf84e7d18e062f099b2bfb89d2c882fea6b42966d2cacef40",
+"s": 21222
 },
 "data/guides/484.js": {
-"h": "e62a0e15246da54ab4b7b10f9163c55c904e0b4013ccc516d89e452c95135ca5",
-"s": 33997
+"h": "0f3045115b26a4ba4cf797c7c88849659c25753296d104ed6d3451fbf7a8aa2e",
+"s": 33888
+},
+"data/guides/516.js": {
+"h": "8d403db990ae91755b02901667cc9607c0aae4ada23f1b0a3e1a605422ddfe14",
+"s": 1371172
+},
+"data/guides/538.js": {
+"h": "45a422f1fb6489e2113ab219a3a4ffae51ed06241d3e27a5144b01979960dddf",
+"s": 105560
+},
+"data/guides/602.js": {
+"h": "07f7de74b4e81ffcf6d581e922fa260de1e44ef4898860dd87dfe41b1fc97306",
+"s": 57817
+},
+"data/guides/603.js": {
+"h": "0fe0aecaddce8213a3877899ac47a7daad2fff367002a10b40d24dd429477a4e",
+"s": 142970
+},
+"data/guides/604.js": {
+"h": "075dadfa9dc7f669e782f4796fd3f7a5d56b83dfbbb3e4daabeccc1e12dd19e5",
+"s": 115022
+},
+"data/guides/606.js": {
+"h": "fdf8cdfc636e611740807dc187f0480f50aa4f2835159d8be364069d7c1c4389",
+"s": 77843
 },
 "data/guides/62.js": {
-"h": "3349bbd307986072be6e4e40e1145e8f5a6d5dbf2bbf2b2ee099c392d0058089",
-"s": 199017
+"h": "b38cfdc6d8b9659dc26dba0aa7118664c10d821435accddade4c280ec09ae290",
+"s": 198123
+},
+"data/guides/65.js": {
+"h": "80552a1867bec5fed0b9d053c574541895c1ec989f1d4ea84901d5319c6266ba",
+"s": 107042
+},
+"data/guides/658.js": {
+"h": "d3243dacabc2dc6d7f9ceb7f919f563409d8fcdccae999adf1c547e08fafb40f",
+"s": 231589
+},
+"data/guides/66.js": {
+"h": "75133e806c5189b367bb64f304e7d2e7e365af09dbcc6d6690efb0d45eef4fb8",
+"s": 120350
+},
+"data/guides/701.js": {
+"h": "804f02bcc0901f8e51d3dfb5f672193e7adce4a3e5edf6de744adb7860e384d9",
+"s": 157093
+},
+"data/guides/702.js": {
+"h": "709c5827e3201d5b8fe795e0f0d14dd8bb90bbc96d7f5495e09317001b12fa3f",
+"s": 91698
+},
+"data/guides/703.js": {
+"h": "2132e903f9ca74fbb2fe6d426afadf8f25044efe75bb33423f1c8edcc8130065",
+"s": 36961
+},
+"data/guides/704.js": {
+"h": "05c10ffa0aa6375276bd0bba38c1311e450c4e8d87c78374991fb602894aac19",
+"s": 132748
+},
+"data/guides/705.js": {
+"h": "a4071caa2f0a4437a26dad67467216557831c7f09905875087c1fff2320061f2",
+"s": 313186
+},
+"data/guides/736.js": {
+"h": "3beb17e6a712a5e29b4bf147618f5f1c6da191cf028a0eb0c202e19db2082965",
+"s": 124195
+},
+"data/guides/773.js": {
+"h": "d6b4f00ce44bbb74c5555821b32a372506f54100548b922fdd4799615597b45a",
+"s": 1395940
+},
+"data/guides/88.js": {
+"h": "5cc921758366e93a48f6e99a064296c9734341044db6d46f09e2781b54ffb6a5",
+"s": 208857
+},
+"data/guides/98.js": {
+"h": "c7dd6963b0265d788f63ba04d07be5be810db0a3e6eabfc8330b537fca9ace41",
+"s": 319885
 },
 "data/icons-extra.js": {
 "h": "9669fbc5b1f9520890c44f06f7af34b5b498514a47b61a6ac112c828d82bb9f4",
