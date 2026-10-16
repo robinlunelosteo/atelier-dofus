@@ -242,6 +242,49 @@ Views.params = (main) => {
       h('button', { class: 'btn primary', onclick: () => Profiles.exportProfile(S().pid) }, '⬇ Exporter le profil « ' + Profiles.cur().name + ' »'),
       h('button', { class: 'btn', onclick: () => S().profiles.forEach((p, i) => setTimeout(() => Profiles.exportProfile(p.id), i * 400)) }, '⬇ Exporter tous les profils'),
       h('button', { class: 'btn', onclick: () => Profiles.pickFile((o) => Profiles.importProfile(o)) }, '⬆ Importer un profil'))));
+  if (window.AtelierSync) {
+    const SY = window.AtelierSync; const cfg = SY.get();
+    const syncCard = h('div', { class: 'card' }, h('h3', null, '☁ Synchronisation entre appareils'));
+    const reloadSoon = () => setTimeout(() => location.reload(), 300);
+    const setLocalStamp = async (stamp) => {       // 0 = « plus ancien que le dépôt » (on reprend le dépôt) ; maintenant = « plus récent » (on envoie)
+      await Store.flush(); const ids = Store.state.profiles.map((x) => x.id);
+      const idx = await Store.kvGet('idx'); if (idx) { idx._at = stamp; await Store.kvSet('idx', idx); }
+      for (const id of ids) { const pd = await Store.kvGet('prof:' + id); if (pd) { pd._at = stamp; await Store.kvSet('prof:' + id, pd); } }
+      Store.dirty = false;
+    };
+    if (cfg) {
+      syncCard.appendChild(h('p', null, 'Connecté au dépôt privé ', h('b', null, cfg.repo), '. Ta progression est copiée automatiquement (quelques secondes après chaque changement) et reprise sur tes autres appareils.'));
+      syncCard.appendChild(h('p', { class: 'muted sm' }, SY.state.err ? '⚠ Dernier essai : ' + SY.state.err : (SY.state.last ? 'Dernière synchro : ' + new Date(SY.state.last).toLocaleTimeString('fr-FR') : 'En attente d\'un changement.')));
+      syncCard.appendChild(h('div', { class: 'row gap wrap' },
+        h('button', { class: 'btn primary', onclick: async () => { try { await Store.flush(); await SY.flush(false); await Store.cloudPull(); toast(SY.state.err ? 'Synchro impossible : ' + SY.state.err : 'Synchronisé', SY.state.err ? 'warn' : undefined); rerender(); } catch (e) { toast('Synchro impossible', 'warn'); } } }, '🔄 Synchroniser maintenant'),
+        h('button', { class: 'btn', onclick: () => confirmBox('Arrêter la synchronisation sur cet appareil ? (tes données restent ici et dans le dépôt)', async () => { SY.clear(); toast('Synchronisation désactivée'); reloadSoon(); }, 'Désactiver') }, 'Désactiver')));
+    } else {
+      syncCard.appendChild(h('p', { class: 'muted' }, 'Relie cet appareil à un dépôt GitHub PRIVÉ pour retrouver la même progression sur tous tes appareils. Tu as besoin d\'un dépôt privé vide et d\'un « jeton » (Fine-grained token, accès à ce seul dépôt, permission Contents : Read and write).'));
+      const repo = h('input', { class: 'inp', placeholder: 'ton-compte/atelier-dofus-data', style: { minWidth: '260px' } });
+      const tok = h('input', { class: 'inp', type: 'password', placeholder: 'Jeton GitHub (github_pat_…)', style: { minWidth: '260px' }, autocomplete: 'off' });
+      const msg = h('div', { class: 'muted sm' });
+      const connect = async () => {
+        msg.textContent = 'Vérification…'; SY.save(repo.value, tok.value);
+        try {
+          const r = await SY.test();
+          const finish = async (mode) => {
+            if (mode === 'pull') await setLocalStamp(0); else if (mode === 'push') await setLocalStamp(Date.now());
+            toast('Synchronisation activée'); reloadSoon();
+          };
+          if (!r.hasData) { await finish('push'); return; }
+          const m = modal('Données déjà présentes dans le dépôt', h('div', null,
+            h('p', null, 'Ce dépôt contient déjà une progression. Que veux-tu faire sur cet appareil ?'),
+            h('div', { class: 'row gap wrap', style: { marginTop: '12px' } },
+              h('button', { class: 'btn primary', onclick: () => { m.close(); finish('pull'); } }, '⬇ Reprendre celle du dépôt (remplace celle de cet appareil)'),
+              h('button', { class: 'btn', onclick: () => { m.close(); finish('push'); } }, '⬆ Envoyer celle de cet appareil (remplace celle du dépôt)'),
+              h('button', { class: 'btn ghost', onclick: () => { m.close(); SY.clear(); msg.textContent = 'Annulé.'; } }, 'Annuler'))), { cls: 'small' });
+        } catch (e) { SY.clear(); msg.textContent = '⚠ ' + (e.message || e); }
+      };
+      syncCard.appendChild(h('div', { class: 'row gap wrap' }, repo, tok, h('button', { class: 'btn primary', onclick: connect }, 'Connecter')));
+      syncCard.appendChild(msg);
+    }
+    main.appendChild(syncCard);
+  }
   main.appendChild(h('div', { class: 'card' }, h('h3', null, 'Sauvegarde complète'),
     h('p', { class: 'muted' }, 'Tes données sont enregistrées automatiquement et synchronisées entre tes appareils (un fichier par profil). Ici, une copie de TOUS les profils en un seul fichier.'),
     h('div', { class: 'row gap wrap' },

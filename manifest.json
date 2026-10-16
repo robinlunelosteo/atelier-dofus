@@ -1,6 +1,6 @@
 {
-"version": "1.3.0",
-"notes": "Première version avec mises à jour automatiques",
+"version": "1.3.1",
+"notes": "Nouveau : synchronisation de ta progression entre appareils (Paramètres > Synchronisation).",
 "files": {
 "css/carte2.css": {
 "h": "3601dfdbba0cf796f08c50867e8b16738e34d1c126cca626dddfe0d70626ac85",
@@ -651,12 +651,16 @@
 "s": 3254
 },
 "index.html": {
-"h": "f4f9b6bd848b19fdc88903810aa8031b9699914d72518d32083376ecf7763c06",
-"s": 1830
+"h": "f409d73e45afc03b808b4d5b9c6381f4a07fee8249a2ba21265992c6338c3897",
+"s": 1873
 },
 "js/core.js": {
 "h": "b063ce7cb556a9e08101be383f2b05b5f026874a846bce1b4dccf51f876e2c9a",
 "s": 31060
+},
+"js/desktop-sync.js": {
+"h": "834d79ea586b7ece483e41879552e176d459556e23f503a6600454e3fa3f0bb1",
+"s": 5216
 },
 "js/mapview.js": {
 "h": "9b23d5bba9c22218e2ae169188a6bb8bb4030bffbd6f145448a5f141e3b305aa",
@@ -691,8 +695,8 @@
 "s": 39448
 },
 "js/views-monde.js": {
-"h": "3d80aacd5d9a502fb97f5565f7a3c6f45d83eba6eedf2855f1f72afb2799ed47",
-"s": 23158
+"h": "87f8bb0ed04fecdc0522df8cdb53d8e5fb7cf5e94172579f2e4e2cdb1eb55dd8",
+"s": 27310
 },
 "js/views-ocre-almanax.js": {
 "h": "df60c25264f2965e39c2c41a6dccf642c4d3c8a588195b2e9fdde006fdfb8f81",
