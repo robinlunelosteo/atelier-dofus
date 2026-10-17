@@ -117,9 +117,9 @@
   const copy = (t) => { const done = () => toast('Copié : ' + t); try { navigator.clipboard.writeText(t).then(done).catch(() => done()); } catch (e) { done(); } };
   /* commande à copier : /travel seul, ou /zaap puis /travel quand le guide indique un zaap */
   const posCmd = (o) => !o.z ? '/travel ' + o.x + ',' + o.y : (o.z[0] === +o.x && o.z[1] === +o.y) ? '/zaap ' + o.z[0] + ',' + o.z[1] : '/zaap ' + o.z[0] + ',' + o.z[1] + ' ; /travel ' + o.x + ',' + o.y;
-  const posLabel = (o) => '📍 ' + o.x + ', ' + o.y + (o.z ? ' · zaap ' + o.z[0] + ',' + o.z[1] : '');
+  const posLabel = (o) => o.z && o.z[0] === +o.x && o.z[1] === +o.y ? '📍 zaap ' + o.x + ', ' + o.y : '📍 ' + o.x + ', ' + o.y + (o.z ? ' · zaap ' + o.z[0] + ',' + o.z[1] : '');
   const mkPos = (o, noMap) => { const b = h('button', { class: 'gpos', onclick: (e) => { e.stopPropagation(); if (e.shiftKey && !noMap) { Views._carte = Views._carte || { wm: 1 }; Views._carte.wm = 1; Views._carte.goto = [+o.x, +o.y]; location.hash = '#/carte'; } else copy(posCmd(o)); } });
-    b.refresh = () => { b.textContent = posLabel(o); b.title = 'Copier ' + posCmd(o) + ' (clic) — voir sur la carte (Maj+clic)'; }; b.refresh(); return b; };
+    b.refresh = () => { b.dataset.z = o.z ? o.z[0] + ',' + o.z[1] : ''; b.textContent = posLabel(o); b.title = 'Copier ' + posCmd(o) + ' (clic) — voir sur la carte (Maj+clic)'; }; b.refresh(); return b; };
   /* zaap cité par son nom juste après une position (« [x,y] (Zaap de Bonta) ») : sa position est retrouvée dans les données du monde */
   const zNorm = (t) => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[’`]/g, "'").replace(/\s+/g, ' ').trim();
   let ZN = null;
@@ -150,6 +150,22 @@
     });
     made.forEach(({ o, b }) => { if (o.z) return; const r = document.createRange(); r.setStartAfter(b); r.setEnd(root, root.childNodes.length); const z = zaapAfter(r.toString()); if (z) { o.z = z; b.refresh(); } });
   }
+  /* « Zaap de la Montagne des Craqueleurs » : le nom de zone devient cliquable et copie /zaap x,y */
+  let ZLIST = null;
+  function zaapify(root) {
+    if (!ZLIST) ZLIST = MONDE.subs.filter((z) => z.z && (z.z[0] || z.z[1])).map((z) => ({ n: norm(z.n), z: z.z })).sort((a, b) => b.n.length - a.n.length);
+    root.querySelectorAll('p').forEach((p) => {
+      if (p.closest('.gpos')) return;
+      const nodes = []; const wk = document.createTreeWalker(p, NodeFilter.SHOW_TEXT); let t, full = ''; while ((t = wk.nextNode())) { nodes.push({ t, s: full.length }); full += t.nodeValue; }
+      const have = new Set([...p.querySelectorAll('.gpos')].map((b) => b.dataset.z).filter(Boolean));
+      const re = /[Zz]aaps?\s+(?:de la |de l['’]|du |des |d['’]|de )?/g; let m; const hits = [];
+      while ((m = re.exec(full))) { const rest = norm(full.slice(m.index + m[0].length, m.index + m[0].length + 60)); const z = ZLIST.find((q) => rest.startsWith(q.n)); if (z && !have.has(z.z[0] + ',' + z.z[1])) hits.push({ end: m.index + m[0].length + z.n.length, z: z.z }); }
+      hits.reverse().forEach((hit) => {
+        const nd = nodes.filter((x) => x.s < hit.end).pop(); if (!nd) return; const at = hit.end - nd.s; if (at <= 0 || at > nd.t.nodeValue.length) return;
+        const after = nd.t.splitText(at); after.parentNode.insertBefore(document.createTextNode(' '), after); after.parentNode.insertBefore(mkPos({ x: hit.z[0], y: hit.z[1], z: hit.z }, true), after);
+      });
+    });
+  }
   /* positions d'un texte brut, avec leur éventuel zaap */
   function parsePos(txt) { const out = []; for (const m of txt.matchAll(POS_RE)) { if (m[1]) { if (out.length) out[out.length - 1].z = [+m[2], +m[3]]; } else out.push({ x: +m[2], y: +m[3], z: zaapAfter(txt.slice(m.index + m[0].length)) }); } return out; }
   function renderStep(gu, i) {
@@ -171,7 +187,7 @@
     });
     const seenPos = new Set(); const positions = [];
     parsePos(out.textContent || '').forEach((o) => { const k = o.x + ',' + o.y; if (!seenPos.has(k)) { seenPos.add(k); positions.push(o); } });
-    posify(out);
+    posify(out); zaapify(out);
     tagify(out);
     const stepBar = itemBar(out, gu, i);
     const wrap = h('div', { class: 'gx-body gx-flow' });

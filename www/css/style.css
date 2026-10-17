@@ -254,3 +254,4 @@ h4{color:var(--gold);letter-spacing:.09em}
 .swatch{width:34px;height:34px;padding:0;border-radius:50%;border:3px solid var(--panel);box-shadow:0 0 0 1px var(--line3);cursor:pointer}
 .swatch.on{box-shadow:0 0 0 3px var(--txt)}
 .th-col{width:44px;height:34px;padding:2px;border:1px solid var(--line3);border-radius:9px;background:var(--inset);cursor:pointer}
+html[data-lt] .gpos{color:#0b5f75;background:#e3f5fa;border-color:#9bd3e3}
