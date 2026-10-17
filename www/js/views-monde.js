@@ -206,23 +206,17 @@ Views.accueil = (main) => {
 Views.params = (main) => {
   main.appendChild(h('div', { class: 'page-head' }, h('div', null, h('h1', null, 'Paramètres'), h('p', { class: 'muted' }, 'Apparence, sauvegarde et infos.'))));
   const st = Store;
-  const TH = (S().prefs.theme = S().prefs.theme || { preset: 'nuit', bg: null, accent: null, accent2: null });
-  const cur = themeVars(TH), base = THEMES[TH.preset] || THEMES.nuit;
-  const setTh = (patch) => { Object.assign(TH, patch); applyTheme(TH); touch(); rerender(); };
-  const pick = (title, hint, list, key, val) => h('div', { class: 'th-sec' }, h('h4', null, title), h('p', { class: 'muted sm' }, hint),
-    h('div', { class: 'row gap wrap' },
-      list.map((c) => h('button', { class: 'th-sw' + (val.toLowerCase() === c ? ' on' : ''), style: { background: c }, title: c, onclick: () => setTh({ [key]: c }) })),
-      h('label', { class: 'th-pick', title: 'Couleur personnalisée' }, h('input', { type: 'color', class: 'th-col', value: val, oninput: (e) => { TH[key] = e.target.value; applyTheme(TH); touch(); }, onchange: () => rerender() }), h('span', null, 'Personnalisée')),
-      h('button', { class: 'btn sm', onclick: () => setTh({ [key]: null }) }, 'Réinitialiser')));
-  const themeCard = (h('div', { class: 'card' }, h('h3', null, '🎨 Apparence'),
-    h('h4', null, 'Ambiances'),
-    h('p', { class: 'muted sm' }, 'Choisis une ambiance : elle règle le fond et les couleurs d\'un coup.'),
-    h('div', { class: 'th-grid' }, Object.keys(THEMES).map((k) => { const T = THEMES[k], V = themeVars({ preset: k }); return h('button', { class: 'th-card' + (TH.preset === k && !TH.bg && !TH.accent && !TH.accent2 ? ' on' : ''), onclick: () => setTh({ preset: k, bg: null, accent: null, accent2: null }) },
-      h('div', { class: 'th-prev', style: { background: V.bg } }, h('i', { style: { background: V.nav1 } }), h('i', { style: { background: V.panel } }), h('i', { style: { background: V.gold } }), h('i', { style: { background: V.violet } })), T.n); })),
-    h('details', { class: 'th-more' }, h('summary', null, 'Personnaliser les couleurs'),
-    pick('Couleur de fond', 'Le fond de l\'appli : toutes les surfaces (cartes, menus, champs) s\'adaptent automatiquement, en sombre comme en clair.', BGS, 'bg', TH.bg || base.bg),
-    pick('Couleur qui ressort', 'Titres, boutons principaux, éléments actifs, barres de progression.', ACCENTS, 'accent', TH.accent || base.accent),
-    pick('Couleur secondaire', 'Lueurs d\'ambiance, onglets, cadres de mise en avant.', ACCENTS, 'accent2', TH.accent2 || base.accent2))));
+  const TH = themeGet();
+  const setTh = (patch) => { themeSet(patch); rerender(); };
+  const modeSel = h('select', { class: 'inp', onchange: (e) => setTh({ mode: e.target.value }) },
+    [['auto', 'Automatique (comme votre ordinateur)'], ['light', 'Clair'], ['dark', 'Sombre']].map(([k, n]) => h('option', { value: k, selected: TH.mode === k }, n)));
+  const themeCard = h('div', { class: 'card' }, h('h3', null, 'Apparence'),
+    h('label', { class: 'th-lab' }, 'Thème'), modeSel,
+    h('label', { class: 'th-lab' }, 'Couleur de l\'application'),
+    h('div', { class: 'swatches' },
+      ACCENTS.map(([n, c]) => h('button', { type: 'button', class: 'swatch' + (TH.accent.toLowerCase() === c ? ' on' : ''), style: { background: c }, title: n, 'aria-label': n, onclick: () => setTh({ accent: c }) })),
+      h('input', { type: 'color', class: 'th-col', value: TH.accent, 'aria-label': 'Autre couleur', onchange: (e) => setTh({ accent: e.target.value }) })),
+    h('p', { class: 'muted sm' }, 'Ce choix est propre à cet appareil (ordinateur, téléphone…).'));
   if (window.AtelierSync) {
     const SY = window.AtelierSync; const cfg = SY.get();
     const syncCard = h('div', { class: 'card' }, h('h3', null, '☁ Synchronisation entre appareils'));

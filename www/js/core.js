@@ -109,7 +109,7 @@ const DEFAULT_STATE = () => ({
   compta: { avec: true, reventes: [
     { id: 'r1', n: 'Robuste', item: 13827, paid: 0, vente: 0, vendu: false },
     { id: 'r2', n: 'Robuste', item: 13827, paid: 0, vente: 0, vendu: false } ] },
-  prefs: { jet: 'max', persoSel: null, ocrePerso: null, theme: { preset: 'ios', bg: null, accent: null, accent2: null } },
+  prefs: { jet: 'max', persoSel: null, ocrePerso: null },
 });
 /* ---------- stockage : une sauvegarde « index » (réglages + liste des profils) et une sauvegarde PAR profil ----------
    cloud : app/idx, prof/<id> (découpés en morceaux si besoin) · local : IndexedDB (cache) · profil actif : propre à chaque appareil */
@@ -370,57 +370,45 @@ function itemLabel(it, extra) {
 }
 
 /* ---------- routeur ---------- */
-/* ---------- thèmes ---------- */
-const THEMES = {
-  ios:      { n: 'iOS sombre', bg: '#000000', accent: '#0a84ff', accent2: '#bf5af2' },
-  iosclair: { n: 'iOS clair',  bg: '#f2f2f7', accent: '#007aff', accent2: '#af52de' },
-  nuit:     { n: 'Nuit',       bg: '#0b0e1c', accent: '#f0bf4f', accent2: '#8b6cff' },
-  noir:     { n: 'Noir pur',   bg: '#050507', accent: '#f0bf4f', accent2: '#7a7a8c' },
-  minuit:   { n: 'Minuit',     bg: '#070d18', accent: '#4fd6ff', accent2: '#4f7cff' },
-  ocean:    { n: 'Océan',      bg: '#06121c', accent: '#4fd6ff', accent2: '#2ec4b6' },
-  foret:    { n: 'Forêt',      bg: '#08130d', accent: '#4cd98a', accent2: '#a3e635' },
-  amethyste:{ n: 'Améthyste',  bg: '#110a1e', accent: '#c58bff', accent2: '#ff7ad9' },
-  bordeaux: { n: 'Bordeaux',   bg: '#160a10', accent: '#ff7a9c', accent2: '#ff9f43' },
-  braise:   { n: 'Braise',     bg: '#140c08', accent: '#ff9f43', accent2: '#ff6a7e' },
-  clair:    { n: 'Clair',      bg: '#f3f4fa', accent: '#b9780a', accent2: '#6b4fe0' },
-  sepia:    { n: 'Parchemin',  bg: '#efe5cf', accent: '#a8630f', accent2: '#7a4f2a' },
-};
-const ACCENTS = ['#f0bf4f', '#ff9f43', '#ff6a7e', '#ff7ad9', '#c58bff', '#8b6cff', '#4f7cff', '#4fd6ff', '#2ec4b6', '#4cd98a', '#a3e635', '#f5f5f7'];
-const BGS = ['#0b0e1c', '#050507', '#070d18', '#06121c', '#08130d', '#110a1e', '#160a10', '#140c08', '#101216', '#1a1d29', '#f3f4fa', '#efe5cf'];
-function shade(hex, k) { const n = parseInt(hex.slice(1), 16); const c = [n >> 16, (n >> 8) & 255, n & 255].map((v) => Math.round(clamp(k >= 0 ? v + (255 - v) * k : v * (1 + k), 0, 255))); return '#' + c.map((v) => v.toString(16).padStart(2, '0')).join(''); }
+/* ---------- thème (identique à Cabinéo, propre à cet appareil) ---------- */
+const THEME_KEY = 'atelier-theme';
+const ACCENTS = [['Vert sauge', '#1d6b5f'], ['Bleu', '#2455a8'], ['Violet', '#6b4bb0'], ['Bordeaux', '#a33a4f'], ['Orange', '#b4601a'], ['Ardoise', '#3f5568']];
+const THEME_DEFAULT = { mode: 'auto', accent: '#cd2f45' };
+function themeGet() {
+  try {
+    const p = JSON.parse(localStorage.getItem(THEME_KEY) || '{}');
+    if (p.preset !== undefined) { localStorage.removeItem(THEME_KEY); return { ...THEME_DEFAULT }; } /* ancien format (ambiances) : abandonné */
+    return { ...THEME_DEFAULT, ...p };
+  } catch (e) { return { ...THEME_DEFAULT }; }
+}
+function themeSet(p) { try { localStorage.setItem(THEME_KEY, JSON.stringify({ ...themeGet(), ...p })); } catch (e) { /* stockage indisponible */ } applyTheme(); }
 function hexRgb(hex) { const n = parseInt(hex.slice(1), 16); return [n >> 16, (n >> 8) & 255, n & 255]; }
 function mixHex(a, b, t) { const A = hexRgb(a), B = hexRgb(b); return '#' + A.map((v, i) => Math.round(v + (B[i] - v) * t).toString(16).padStart(2, '0')).join(''); }
-function lumaHex(hex) { const [r, g, b] = hexRgb(hex); return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255; }
-/* palette complète dérivée de 3 couleurs : fond, accent (ce qui ressort), accent secondaire */
+/* palette Cabinéo (clair / sombre) rangée sous les noms de variables d'Atelier Dofus */
 function themeVars(t) {
-  t = t || {}; const T = THEMES[t.preset] || THEMES.nuit;
-  const bg = /^#[0-9a-f]{6}$/i.test(t.bg || '') ? t.bg : T.bg;
-  const acc = /^#[0-9a-f]{6}$/i.test(t.accent || '') ? t.accent : T.accent;
-  const acc2 = /^#[0-9a-f]{6}$/i.test(t.accent2 || '') ? t.accent2 : T.accent2;
-  const light = lumaHex(bg) > 0.55, up = light ? '#ffffff' : mixHex('#ffffff', mixHex(bg, acc2, 0.6), 0.45), dn = '#000000';
-  const txt = light ? mixHex(bg, '#000000', 0.88) : mixHex(bg, '#ffffff', 0.92);
-  const v = light
-    ? { bg, bg2: mixHex(bg, dn, 0.04), panel: mixHex(bg, up, 0.7), panel2: mixHex(bg, up, 0.4), line: mixHex(bg, dn, 0.13), line2: mixHex(bg, dn, 0.09), line3: mixHex(bg, dn, 0.22), inset: mixHex(bg, up, 0.55), surf: mixHex(bg, up, 0.5), hover: mixHex(bg, dn, 0.06), muted: mixHex(txt, bg, 0.45), soft: mixHex(txt, bg, 0.22), nav1: mixHex(bg, up, 0.6), nav2: mixHex(bg, dn, 0.02), g1: mixHex(bg, acc2, 0.14), g2: mixHex(bg, acc, 0.12) }
-    : { bg, bg2: mixHex(bg, up, 0.035), panel: mixHex(bg, up, 0.075), panel2: mixHex(bg, up, 0.115), line: mixHex(bg, up, 0.17), line2: mixHex(bg, up, 0.12), line3: mixHex(bg, up, 0.3), inset: mixHex(bg, dn, 0.35), surf: mixHex(bg, up, 0.06), hover: mixHex(bg, up, 0.13), muted: mixHex(bg, txt, 0.55), soft: mixHex(bg, txt, 0.78), nav1: mixHex(bg, up, 0.05), nav2: mixHex(bg, dn, 0.25), g1: mixHex(bg, acc2, 0.22), g2: mixHex(bg, acc, 0.14) };
-  v.txt = txt; v.gold = acc; v.gold2 = light ? mixHex(acc, dn, 0.2) : mixHex(acc, up, 0.35); v.violet = acc2;
-  v.v1 = mixHex(bg, acc2, light ? 0.18 : 0.32); v.v2 = mixHex(bg, acc2, light ? 0.3 : 0.5); v.opt = v.panel;
-  v.onacc = lumaHex(acc) > 0.55 ? '#1a1205' : '#ffffff';
-  v.scheme = light ? 'light' : 'dark'; v.light = light;
-  if (/^ios/.test(t.preset || '') && !/^#[0-9a-f]{6}$/i.test(t.bg || '')) { /* palette système iOS (fond personnalisé = on garde la dérivation) */
-    Object.assign(v, light
-      ? { bg: '#f2f2f7', bg2: '#ececf1', panel: '#ffffff', panel2: '#ffffff', line: '#c6c6c8', line2: '#e5e5ea', line3: '#aeaeb2', inset: '#e9e9ee', surf: '#ffffff', hover: '#e5e5ea', muted: '#8a8a8e', soft: '#636366', txt: '#000000', nav1: '#f9f9fb', nav2: '#f9f9fb', g1: '#f2f2f7', g2: '#f2f2f7' }
-      : { bg: '#000000', bg2: '#0a0a0c', panel: '#1c1c1e', panel2: '#2c2c2e', line: '#38383a', line2: '#2c2c2e', line3: '#545458', inset: '#2c2c2e', surf: '#1c1c1e', hover: '#2c2c2e', muted: '#8e8e93', soft: '#aeaeb2', txt: '#ffffff', nav1: '#121214', nav2: '#121214', g1: '#000000', g2: '#000000' });
-  }
-  return v;
+  t = t || themeGet();
+  const dark = t.mode === 'dark' || (t.mode === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches);
+  const P = dark
+    ? { bg: '#111715', surface: '#19211f', surface2: '#1f2927', field: '#222d2a', fieldLine: '#34413d', line: '#2a3532', ink: '#e5ebe8', mut: '#92a29d' }
+    : { bg: '#f3f4f1', surface: '#ffffff', surface2: '#f6f7f4', field: '#eef2ef', fieldLine: '#d3dbd6', line: '#dfe4df', ink: '#1c2523', mut: '#66726e' };
+  const accent = /^#[0-9a-f]{6}$/i.test(t.accent || '') ? t.accent : THEME_DEFAULT.accent;
+  const acc = dark ? mixHex(accent, '#ffffff', 0.4) : accent;
+  const soft = mixHex(P.surface, acc, dark ? 0.24 : 0.15);
+  return {
+    bg: P.bg, bg2: P.surface2, panel: P.surface, panel2: P.surface, surf: P.surface2, inset: P.field, hover: P.surface2,
+    line: P.line, line2: P.line, line3: P.fieldLine, txt: P.ink, muted: P.mut, soft: mixHex(P.ink, P.bg, 0.25),
+    nav1: P.surface, nav2: P.surface, g1: P.bg, g2: P.bg, opt: P.surface,
+    gold: acc, gold2: acc, violet: acc, v1: acc, v2: acc, accsoft: soft,
+    onacc: dark ? '#0b1412' : '#ffffff', scheme: dark ? 'dark' : 'light', light: !dark,
+  };
 }
-function applyTheme(t) {
-  const v = themeVars(t); const r = document.documentElement.style;
-  for (const k in v) if (k !== 'light') r.setProperty('--' + k, v[k]);
-  document.documentElement.toggleAttribute('data-lt', !!v.light);
-  document.documentElement.toggleAttribute('data-ios', /^ios/.test((t && t.preset) || ''));
-  try { localStorage.setItem('atelier-theme', JSON.stringify(t || {})); } catch (e) { /* rien */ }
+function applyTheme() {
+  const t = themeGet(), v = themeVars(t), r = document.documentElement;
+  for (const k in v) if (k !== 'light') r.style.setProperty('--' + k, v[k]);
+  r.toggleAttribute('data-lt', !!v.light);
 }
-try { applyTheme(JSON.parse(localStorage.getItem('atelier-theme'))); } catch (e) { /* rien */ }
+applyTheme();
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme);
 const LOGO_SVG = `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="lg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="var(--gold2)"/><stop offset="1" stop-color="var(--gold)"/></linearGradient><linearGradient id="lg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs><path d="M32 4C45 4 53 26 53 40c0 12-9 20-21 20S11 52 11 40C11 26 19 4 32 4z" fill="url(#lg1)" stroke="rgba(0,0,0,.35)" stroke-width="1.5"/><path d="M32 4C45 4 53 26 53 40H11C11 26 19 4 32 4z" fill="rgba(255,255,255,.14)"/><path d="M32 4L22 24l10 36M32 4l10 20-10 36M11 40l11-16h20l11 16" fill="none" stroke="rgba(60,30,0,.28)" stroke-width="1.4" stroke-linejoin="round"/><path d="M24 14c4-6 9-7 11-6-6 3-9 9-11 22-3-6-3-11 0-16z" fill="url(#lg2)"/><path d="M45 8l1.6 3.6L50 13l-3.4 1.4L45 18l-1.6-3.6L40 13l3.4-1.4z" fill="#fff"/></svg>`;
 (function () { try { const l = document.querySelector('link[rel=icon]') || document.head.appendChild(h('link', { rel: 'icon' })); l.href = 'data:image/svg+xml,' + encodeURIComponent(LOGO_SVG.replace(/var\(--gold2\)/g, '#ffdc87').replace(/var\(--gold\)/g, '#f0bf4f')); } catch (e) { /* rien */ } })();
 const Views = {};
@@ -474,7 +462,6 @@ function buildShell() {
 async function boot() {
   await Store.load();
   if (window.GuidesAPI && GuidesAPI.init) await GuidesAPI.init();
-  applyTheme(S().prefs.theme);
   buildShell();
   window.addEventListener('hashchange', () => route());
   route();
