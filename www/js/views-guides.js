@@ -361,7 +361,7 @@
             renderStep(gu, k)));
         }
         mid.appendChild(pager(page, pages, per));
-        drawToc(); drawBars();
+        drawToc();
         if (scrollTo != null) { const el = document.getElementById('gstep-' + scrollTo); if (el) el.scrollIntoView({ block: 'start' }); }
         return;
       }
@@ -370,7 +370,7 @@
         h('div', { class: 'gs-head' }, h('div', { class: 'gx-num' }, 'Étape ', h('b', null, i + 1), h('small', null, ' / ' + n)), h('span', { class: 'sp' }), h('button', { class: 'btn' + (done ? ' on' : ' primary'), onclick: () => { setStep(gu.id, i, !done); if (!done && i < n - 1) { i++; g.cur[gu.id] = i; } draw(); refreshBars(); } }, done ? '✓ Faite (annuler)' : '✔ Valider' + (w.length > 1 ? ' pour ' + w.length + ' persos' : ''))),
         renderStep(gu, i),
         h('div', { class: 'row between', style: { marginTop: '14px' } }, h('button', { class: 'btn', disabled: i === 0, onclick: () => go2(i - 1) }, '← Précédente'), h('button', { class: 'btn', disabled: i === n - 1, onclick: () => go2(i + 1) }, 'Suivante →'))));
-      drawToc(); drawBars();
+      drawToc();
     }
     const key = (e) => { if (!document.getElementById('main') || !location.hash.startsWith('#/guides') || /INPUT|TEXTAREA|SELECT/.test((e.target || {}).tagName || '')) return; if (g.view !== 'liste') { if (e.key === 'ArrowRight') go2(i + 1); else if (e.key === 'ArrowLeft') go2(i - 1); } };
     document.addEventListener('keydown', key); Views._cleanup = () => { document.removeEventListener('keydown', key); refreshBars = () => {}; };
