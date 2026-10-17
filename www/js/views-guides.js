@@ -120,21 +120,38 @@
   const posLabel = (o) => '📍 ' + o.x + ', ' + o.y + (o.z ? ' · zaap ' + o.z[0] + ',' + o.z[1] : '');
   const mkPos = (o, noMap) => { const b = h('button', { class: 'gpos', onclick: (e) => { e.stopPropagation(); if (e.shiftKey && !noMap) { Views._carte = Views._carte || { wm: 1 }; Views._carte.wm = 1; Views._carte.goto = [+o.x, +o.y]; location.hash = '#/carte'; } else copy(posCmd(o)); } });
     b.refresh = () => { b.textContent = posLabel(o); b.title = 'Copier ' + posCmd(o) + ' (clic) — voir sur la carte (Maj+clic)'; }; b.refresh(); return b; };
+  /* zaap cité par son nom juste après une position (« [x,y] (Zaap de Bonta) ») : sa position est retrouvée dans les données du monde */
+  const zNorm = (t) => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[’`]/g, "'").replace(/\s+/g, ' ').trim();
+  let ZN = null;
+  function zaapNames() {
+    if (ZN) return ZN; ZN = { map: new Map(), list: [] }; const D = window.D_MONDE; if (!D) return ZN; const area = new Map();
+    D.subs.forEach((sb) => { if (!sb.z || (!sb.z[0] && !sb.z[1])) return; const k = zNorm(sb.n); if (!ZN.map.has(k)) ZN.map.set(k, sb.z); if (sb.wm === 1 && sb.an) { const a = zNorm(sb.an); if (!area.has(a)) area.set(a, sb.z); } });
+    area.forEach((z, k) => { if (!ZN.map.has(k)) ZN.map.set(k, z); });
+    if (area.has('astrub') && !ZN.map.has("cite d'astrub")) ZN.map.set("cite d'astrub", area.get('astrub')); /* le zaap d'Astrub n'est pas rattaché à sa sous-zone dans les données */
+    ZN.list = [...ZN.map.keys()].sort((a, b) => b.length - a.length); return ZN;
+  }
+  function zaapAfter(txt) {
+    const m = /^\s*[(\[]?\s*zaap\s+(?:de |du |des |d['’])\s*([\s\S]*)/i.exec(txt.slice(0, 90)); if (!m) return null;
+    const Z = zaapNames(), r1 = zNorm(m[1]), r2 = r1.replace(/^(la |l'|le |les )/, '');
+    const k = Z.list.find((n) => r1.startsWith(n) || r2.startsWith(n)); return k ? Z.map.get(k) : null;
+  }
   const POS_RE = /\[(zaap:)?(-?\d+), ?(-?\d+)\]/g;
   function posify(root) {
     const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT); const list = []; let n; while ((n = w.nextNode())) if (/\[(zaap:)?-?\d+, ?-?\d+\]/.test(n.nodeValue)) list.push(n);
     let last = null; // dernière position rencontrée : un [zaap:x,y] qui la suit lui est rattaché
+    const made = [];
     list.forEach((t) => {
       const frag = document.createDocumentFragment(); let pos0 = 0; const s = t.nodeValue;
       s.replace(POS_RE, (m, zp, x, y, off) => { frag.appendChild(document.createTextNode(s.slice(pos0, off))); pos0 = off + m.length;
         if (zp) { if (last) { last.o.z = [+x, +y]; last.b.refresh(); } else frag.appendChild(document.createTextNode(m)); }
-        else { const o = { x, y, z: null }; const b = mkPos(o); last = { o, b }; frag.appendChild(b); }
+        else { const o = { x, y, z: null }; const b = mkPos(o); last = { o, b }; made.push(last); frag.appendChild(b); }
         return m; });
       frag.appendChild(document.createTextNode(s.slice(pos0))); t.parentNode.replaceChild(frag, t);
     });
+    made.forEach(({ o, b }) => { if (o.z) return; const r = document.createRange(); r.setStartAfter(b); r.setEnd(root, root.childNodes.length); const z = zaapAfter(r.toString()); if (z) { o.z = z; b.refresh(); } });
   }
   /* positions d'un texte brut, avec leur éventuel zaap */
-  function parsePos(txt) { const out = []; for (const m of txt.matchAll(POS_RE)) { if (m[1]) { if (out.length) out[out.length - 1].z = [+m[2], +m[3]]; } else out.push({ x: +m[2], y: +m[3], z: null }); } return out; }
+  function parsePos(txt) { const out = []; for (const m of txt.matchAll(POS_RE)) { if (m[1]) { if (out.length) out[out.length - 1].z = [+m[2], +m[3]]; } else out.push({ x: +m[2], y: +m[3], z: zaapAfter(txt.slice(m.index + m[0].length)) }); } return out; }
   function renderStep(gu, i) {
     const st = gu.steps[i]; const doc = new DOMParser().parseFromString('<div>' + (st.h || '<p><i>(étape vide)</i></p>') + '</div>', 'text/html'); const box = doc.body.firstChild;
     clean(box);
@@ -236,6 +253,8 @@
     return bar;
   }
   const pct = (a, b) => b ? Math.round(a / b * 100) : 0;
+  /* barres de progression d'un guide, une par perso sélectionné */
+  const bars = (gu) => h('div', null, who().map((pid) => { const n = countDone(gu.id, pid); return h('div', { style: { marginTop: '6px' } }, h('span', { class: 'muted sm' }, getPerso(pid).nom), progress(pct(n, gu.n), n + ' / ' + gu.n)); }));
 
   /* ---- vues ---- */
   Views.guides = (main, arg) => {

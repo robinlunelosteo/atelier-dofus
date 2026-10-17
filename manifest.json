@@ -1,6 +1,6 @@
 {
-"version": "1.5.1",
-"notes": "Apparence identique à Cabinéo : thème Auto/Clair/Sombre et couleur de l'application",
+"version": "1.5.2",
+"notes": "Correction de l'erreur dans « Mes guides suivis » ; commandes /zaap + /travel quand le guide cite un zaap",
 "files": {
 "css/carte2.css": {
 "h": "3601dfdbba0cf796f08c50867e8b16738e34d1c126cca626dddfe0d70626ac85",
@@ -1043,8 +1043,8 @@
 "s": 19534
 },
 "js/views-guides.js": {
-"h": "23cf55fd3b0249228f8038c58a3b7cab8e635ae81bae83949b95ce97fa932b8f",
-"s": 42560
+"h": "065191b775a052d2f47bbd03916ccf9ea80faecb73f9805fe3adcf882843747d",
+"s": 44536
 },
 "js/views-monde.js": {
 "h": "2ac24b201e81023f972bfcf46435d10a538cedd96a7019bebb2fb0fbf11e0387",
