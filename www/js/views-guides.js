@@ -165,7 +165,7 @@
     if (lists.length) wrap.appendChild(sec('✅ À faire', h('div', { class: 'gbody' }, lists)));
     if (stepBar) wrap.appendChild(stepBar);
     if ((out.textContent || '').trim() || out.querySelector('img')) {
-      if (lists.length) wrap.appendChild(h('details', { class: 'gx-more' }, h('summary', null, '📖 Explications et astuces'), out));
+      if (lists.length) wrap.appendChild(sec('📖 Détails de l\'étape', out));
       else wrap.appendChild(out);
     }
     return wrap;
@@ -316,6 +316,9 @@
 
   function reader(main, gu) {
     const u = U(); const g = G(); const n = gu.n; let i = curStep(gu.id); const PER = 1; if (g.last !== gu.id) { g.last = gu.id; touch(); }
+    const tabIds = [...g.follow.filter((x) => LIB.has(x))]; if (!tabIds.includes(gu.id)) tabIds.push(gu.id);
+    if (tabIds.length > 1) main.appendChild(h('div', { class: 'gx-tabs' }, tabIds.map((id) => { const t = LIB.get(id); const w0 = who(); const d = w0.length ? Math.min(...w0.map((pid) => countDone(id, pid))) : 0;
+      return h('button', { class: 'gx-tab' + (id === gu.id ? ' on' : ''), title: t.name, onclick: () => { U().open = id; rerender(); window.scrollTo(0, 0); } }, h('span', null, t.name), h('i', { style: { width: pct(d, t.n) + '%' } })); })));
     main.appendChild(h('div', { class: 'gx-top' },
       h('button', { class: 'btn ghost', onclick: () => { u.open = null; location.hash = '#/guides'; rerender(); } }, '← Guides'),
       h('div', { class: 'gx-title' }, h('h2', null, gu.name), h('small', { class: 'muted' }, 'par ' + gu.author + ' · ' + gu.n + ' étapes')),
@@ -327,16 +330,15 @@
           h('button', { class: g.view === 'liste' ? 'on' : '', onclick: () => { g.view = 'liste'; touch(); rerender(); } }, 'Liste')))));
     main.appendChild(whoBar());
     const lay = h('div', { class: 'glay' }); const side = h('div', { class: 'gside card' }); const mid = h('div', { class: 'gmain' }); lay.appendChild(side); lay.appendChild(mid); main.appendChild(lay);
-    const barBox = h('div'); const toc = h('div', { class: 'gtoc' });
-    side.appendChild(barBox); const tocBox = h('details', { class: 'gx-toc' }, h('summary', null, '📑 Sommaire'), toc); if (window.innerWidth > 820) tocBox.open = true; side.appendChild(tocBox);
+    const toc = h('div', { class: 'gtoc' });
+    const tocBox = h('details', { class: 'gx-toc' }, h('summary', null, '📑 Sommaire'), toc); if (window.innerWidth > 820) tocBox.open = true; side.appendChild(tocBox);
     function drawToc() {
       clear(toc); const w = who();
       gu.steps.forEach((st, k) => { const done = w.length && w.every((pid) => isDone(gu.id, pid, k)); const part = !done && w.some((pid) => isDone(gu.id, pid, k));
         toc.appendChild(h('button', { class: 'gt' + (k === i ? ' cur' : '') + (done ? ' done' : part ? ' part' : ''), onclick: () => go2(k) }, done ? '✓' : (k + 1)));
       });
     }
-    function drawBars() { clear(barBox); barBox.appendChild(bars(gu)); }
-    refreshBars = () => { drawBars(); drawToc(); };
+    refreshBars = () => { drawToc(); };
     function go2(k) { i = clamp(k, 0, n - 1); g.cur[gu.id] = i; touch(); draw(g.view === 'liste' ? i : null); if (g.view !== 'liste') mainEl.scrollTop = 0; }
     const mainEl = document.getElementById('main');
     function pager(page, pages, per) {

@@ -1,14 +1,14 @@
 {
-"version": "1.4.1",
-"notes": "Ocre : initiales distinctes, choix des persos toujours visible",
+"version": "1.4.2",
+"notes": "Guides : onglets pour changer de guide, texte complet des étapes, barres de progression retirées",
 "files": {
 "css/carte2.css": {
 "h": "3601dfdbba0cf796f08c50867e8b16738e34d1c126cca626dddfe0d70626ac85",
 "s": 450
 },
 "css/style.css": {
-"h": "42d60f387af4e234837218013bd495691a77a8d36769e481da5d3868149bd1ac",
-"s": 91451
+"h": "21e1e42bf463b9e531e39a4562894c9ca55d012522520e555171d81a0fc87b4e",
+"s": 92051
 },
 "data/almanax.js": {
 "h": "e8e2ec568980d33e9c3847295668cf84e55d93b0b3a538ab4dd5dfdccf22f4d4",
@@ -1039,8 +1039,8 @@
 "s": 19534
 },
 "js/views-guides.js": {
-"h": "44679af668b583ec3182d3457bca74133998629e4c3e35ab3b905a46302f76f4",
-"s": 43147
+"h": "fb6cf5afbb5a3f205613403d38df55f2f618c5224326f5fe14dce993b12d9b16",
+"s": 43522
 },
 "js/views-monde.js": {
 "h": "f344c6592130e8936a1287ffb3bb333e17cb309c7954c2eada56962aea3a7f2f",

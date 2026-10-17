@@ -257,3 +257,10 @@ html[data-lt]{--gy:#9a6700;--gr:#c62828;--gb:#0a5fc2}
 /* Ocre : initiales lisibles + barre de choix toujours visible */
 .arch-who span{width:auto;min-width:18px;height:18px;padding:0 5px;border-radius:9px}
 .ocre-who{position:sticky;top:0;z-index:5;background:var(--bg,var(--surf));padding:8px 0;margin-bottom:6px}
+
+/* Guides : onglets pour changer de guide */
+.gx-tabs{display:flex;gap:6px;overflow-x:auto;margin:0 0 12px;padding-bottom:4px;scrollbar-width:thin}
+.gx-tab{position:relative;flex:0 0 auto;max-width:230px;background:var(--surf);border:1px solid var(--line2);color:var(--soft);border-radius:10px;padding:8px 12px 10px;font-size:13px;cursor:pointer;overflow:hidden}
+.gx-tab span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gx-tab i{position:absolute;left:0;bottom:0;height:3px;background:var(--green)}
+.gx-tab.on{border-color:var(--gold);color:var(--txt);font-weight:600}
