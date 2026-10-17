@@ -1,6 +1,6 @@
 {
-"version": "1.5.4",
-"notes": "Zaap cliquable aussi pour « Zaap vers Bonta », Brâkmar, Astrub, Sufokia, Tainéla…",
+"version": "1.5.5",
+"notes": "Positions « [20,29 ] » avec espace reconnues dans les guides",
 "files": {
 "css/carte2.css": {
 "h": "3601dfdbba0cf796f08c50867e8b16738e34d1c126cca626dddfe0d70626ac85",
@@ -1043,8 +1043,8 @@
 "s": 19534
 },
 "js/views-guides.js": {
-"h": "14011f0163bd3d6cbb33dac7172b815bb71458b718e6a61edcdd9a7bbafd8ab2",
-"s": 46718
+"h": "8d52f92db99213e6467bf5b17616768b3f459f27d8b2ade2691443a485f80bf9",
+"s": 46730
 },
 "js/views-monde.js": {
 "h": "2ac24b201e81023f972bfcf46435d10a538cedd96a7019bebb2fb0fbf11e0387",

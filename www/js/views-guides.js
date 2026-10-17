@@ -135,9 +135,9 @@
     const Z = zaapNames(), r1 = zNorm(m[1]), r2 = r1.replace(/^(la |l'|le |les )/, '');
     const k = Z.list.find((n) => r1.startsWith(n) || r2.startsWith(n)); return k ? Z.map.get(k) : null;
   }
-  const POS_RE = /\[(zaap:)?(-?\d+), ?(-?\d+)\]/g;
+  const POS_RE = /\[ ?(zaap:)?(-?\d+) ?, ?(-?\d+) ?\]/g;
   function posify(root) {
-    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT); const list = []; let n; while ((n = w.nextNode())) if (/\[(zaap:)?-?\d+, ?-?\d+\]/.test(n.nodeValue)) list.push(n);
+    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT); const list = []; let n; while ((n = w.nextNode())) if (/\[ ?(zaap:)?-?\d+ ?, ?-?\d+ ?\]/.test(n.nodeValue)) list.push(n);
     let last = null; // dernière position rencontrée : un [zaap:x,y] qui la suit lui est rattaché
     const made = [];
     list.forEach((t) => {
