@@ -154,20 +154,10 @@
     parsePos(out.textContent || '').forEach((o) => { const k = o.x + ',' + o.y; if (!seenPos.has(k)) { seenPos.add(k); positions.push(o); } });
     posify(out);
     tagify(out);
-    const root = out.firstElementChild || out;
     const stepBar = itemBar(out, gu, i);
-    const sec = (t, ...kids) => h('div', { class: 'gx-sec' }, h('div', { class: 'gx-sec-t' }, t), ...kids);
-    const wrap = h('div', { class: 'gx-body' });
-    const gp = [...root.children].find((el) => el.tagName === 'P' && /^\s*Objectifs?\s*:/i.test(el.textContent));
-    if (gp) { gp.remove(); wrap.appendChild(h('div', { class: 'gx-goal' }, h('span', { class: 'gx-goal-i' }, '🎯'), gp)); }
-    if (positions.length) wrap.appendChild(sec('📍 Où aller', h('div', { class: 'gx-pos' }, positions.slice(0, 6).map((o) => mkPos(o)))));
-    const lists = [...root.querySelectorAll('ul[data-type="taskList"]')].filter((ul) => !ul.parentElement.closest('ul[data-type="taskList"]'));
-    if (lists.length) wrap.appendChild(sec('✅ À faire', h('div', { class: 'gbody' }, lists)));
+    const wrap = h('div', { class: 'gx-body gx-flow' });
+    wrap.appendChild(out);
     if (stepBar) wrap.appendChild(stepBar);
-    if ((out.textContent || '').trim() || out.querySelector('img')) {
-      if (lists.length) wrap.appendChild(sec('📖 Détails de l\'étape', out));
-      else wrap.appendChild(out);
-    }
     return wrap;
   }
   let refreshBars = () => {};
