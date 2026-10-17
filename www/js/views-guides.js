@@ -153,12 +153,15 @@
   /* « Zaap de la Montagne des Craqueleurs » : le nom de zone devient cliquable et copie /zaap x,y */
   let ZLIST = null;
   function zaapify(root) {
-    if (!ZLIST) ZLIST = MONDE.subs.filter((z) => z.z && (z.z[0] || z.z[1])).map((z) => ({ n: norm(z.n), z: z.z })).sort((a, b) => b.n.length - a.n.length);
+    if (!ZLIST) {
+    const EXTRA = { 'bonta': [-31, -56], 'brakmar': [-26, 37], "cite d'astrub": [5, -18], "d'astrub": [5, -18], 'astrub': [5, -18], 'tainela': [1, -32], 'route des ames': [-1, -3], 'paturages': [2, -5], 'dune des ossements': [15, -58], 'futaie ennei': [39, -82], 'montage des craqueleurs': [-5, -8], 'sufokia': [13, 26], 'bourgade': [-78, -41], 'pandala': [20, -29], 'eleveurs': [-16, 1], 'village ensevelli': [-77, -73] };
+    ZLIST = MONDE.subs.filter((z) => z.z && (z.z[0] || z.z[1])).map((z) => ({ n: norm(z.n), z: z.z })).concat(Object.keys(EXTRA).map((n) => ({ n, z: EXTRA[n] }))).sort((a, b) => b.n.length - a.n.length);
+    }
     root.querySelectorAll('p').forEach((p) => {
       if (p.closest('.gpos')) return;
       const nodes = []; const wk = document.createTreeWalker(p, NodeFilter.SHOW_TEXT); let t, full = ''; while ((t = wk.nextNode())) { nodes.push({ t, s: full.length }); full += t.nodeValue; }
       const have = new Set([...p.querySelectorAll('.gpos')].map((b) => b.dataset.z).filter(Boolean));
-      const re = /[Zz]aaps?\s+(?:de la |de l['’]|du |des |d['’]|de )?/g; let m; const hits = [];
+      const re = /[Zz]aaps?\s+(?:de la |de l['’]|du |des |d['’]|de |vers (?:la |le |l['’]|les )?|à (?:la |l['’])?|au |aux )?/g; let m; const hits = [];
       while ((m = re.exec(full))) { const rest = norm(full.slice(m.index + m[0].length, m.index + m[0].length + 60)); const z = ZLIST.find((q) => rest.startsWith(q.n)); if (z && !have.has(z.z[0] + ',' + z.z[1])) hits.push({ end: m.index + m[0].length + z.n.length, z: z.z }); }
       hits.reverse().forEach((hit) => {
         const nd = nodes.filter((x) => x.s < hit.end).pop(); if (!nd) return; const at = hit.end - nd.s; if (at <= 0 || at > nd.t.nodeValue.length) return;

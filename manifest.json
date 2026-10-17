@@ -1,6 +1,6 @@
 {
-"version": "1.5.3",
-"notes": "Guides : « Zaap de … » cliquable (copie /zaap), correctifs",
+"version": "1.5.4",
+"notes": "Zaap cliquable aussi pour « Zaap vers Bonta », Brâkmar, Astrub, Sufokia, Tainéla…",
 "files": {
 "css/carte2.css": {
 "h": "3601dfdbba0cf796f08c50867e8b16738e34d1c126cca626dddfe0d70626ac85",
@@ -1043,8 +1043,8 @@
 "s": 19534
 },
 "js/views-guides.js": {
-"h": "2411d200107c2da589a0db4cfa5e52a86ace39866aa4e7786c9f648fcb89f856",
-"s": 46162
+"h": "14011f0163bd3d6cbb33dac7172b815bb71458b718e6a61edcdd9a7bbafd8ab2",
+"s": 46718
 },
 "js/views-monde.js": {
 "h": "2ac24b201e81023f972bfcf46435d10a538cedd96a7019bebb2fb0fbf11e0387",
