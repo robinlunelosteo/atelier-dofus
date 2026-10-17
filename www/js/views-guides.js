@@ -234,9 +234,6 @@
     return bar;
   }
   const pct = (a, b) => b ? Math.round(a / b * 100) : 0;
-  function bars(gu) {
-    return h('div', { class: 'gbars' }, S().persos.map((p) => { const n = countDone(gu.id, p.id); return h('div', { class: 'gbar' }, h('span', null, p.nom), progress(pct(n, gu.n), n + '/' + gu.n)); }));
-  }
 
   /* ---- vues ---- */
   Views.guides = (main, arg) => {
@@ -321,16 +318,11 @@
           h('button', { class: g.view !== 'liste' ? 'on' : '', onclick: () => { g.view = 'etape'; touch(); rerender(); } }, 'Étape par étape'),
           h('button', { class: g.view === 'liste' ? 'on' : '', onclick: () => { g.view = 'liste'; touch(); rerender(); } }, 'Liste')))));
     main.appendChild(whoBar());
-    const lay = h('div', { class: 'glay' }); const side = h('div', { class: 'gside card' }); const mid = h('div', { class: 'gmain' }); lay.appendChild(side); lay.appendChild(mid); main.appendChild(lay);
-    const toc = h('div', { class: 'gtoc' });
-    const tocBox = h('details', { class: 'gx-toc' }, h('summary', null, '📑 Sommaire'), toc); if (window.innerWidth > 820) tocBox.open = true; side.appendChild(tocBox);
-    function drawToc() {
-      clear(toc); const w = who();
-      gu.steps.forEach((st, k) => { const done = w.length && w.every((pid) => isDone(gu.id, pid, k)); const part = !done && w.some((pid) => isDone(gu.id, pid, k));
-        toc.appendChild(h('button', { class: 'gt' + (k === i ? ' cur' : '') + (done ? ' done' : part ? ' part' : ''), onclick: () => go2(k) }, done ? '✓' : (k + 1)));
-      });
-    }
-    refreshBars = () => { drawToc(); };
+    const mid = h('div', { class: 'gmain' }); main.appendChild(mid);
+    const isOk = (k) => { const w = who(); return !!w.length && w.every((pid) => isDone(gu.id, pid, k)); };
+    const jump = () => h('select', { class: 'inp gx-jump', title: 'Aller à une étape', onchange: (e) => go2(+e.target.value) },
+      gu.steps.map((st, k) => h('option', { value: k, selected: k === i }, (isOk(k) ? '✓ ' : '') + 'Étape ' + (k + 1))));
+    refreshBars = () => {};
     function go2(k) { i = clamp(k, 0, n - 1); g.cur[gu.id] = i; touch(); draw(g.view === 'liste' ? i : null); if (g.view !== 'liste') mainEl.scrollTop = 0; }
     const mainEl = document.getElementById('main');
     function pager(page, pages, per) {
@@ -353,16 +345,16 @@
             renderStep(gu, k)));
         }
         mid.appendChild(pager(page, pages, per));
-        drawToc();
         if (scrollTo != null) { const el = document.getElementById('gstep-' + scrollTo); if (el) el.scrollIntoView({ block: 'start' }); }
         return;
       }
-      const done = w.length && w.every((pid) => isDone(gu.id, pid, i));
+      const done = isOk(i);
       mid.appendChild(h('div', { class: 'card gstep' },
-        h('div', { class: 'gs-head' }, h('div', { class: 'gx-num' }, 'Étape ', h('b', null, i + 1), h('small', null, ' / ' + n)), h('span', { class: 'sp' }), h('button', { class: 'btn' + (done ? ' on' : ' primary'), onclick: () => { setStep(gu.id, i, !done); if (!done && i < n - 1) { i++; g.cur[gu.id] = i; } draw(); refreshBars(); } }, done ? '✓ Faite (annuler)' : '✔ Valider' + (w.length > 1 ? ' pour ' + w.length + ' persos' : ''))),
+        h('div', { class: 'gs-head' }, h('div', { class: 'gx-num' }, 'Étape ', h('b', null, i + 1), h('small', null, ' / ' + n)), h('span', { class: 'sp' }),
+          done ? h('button', { class: 'btn sm on', title: 'Marquer cette étape comme non faite', onclick: () => { setStep(gu.id, i, false); draw(); } }, '✓ Faite · annuler') : null, jump()),
         renderStep(gu, i),
-        h('div', { class: 'row between', style: { marginTop: '14px' } }, h('button', { class: 'btn', disabled: i === 0, onclick: () => go2(i - 1) }, '← Précédente'), h('button', { class: 'btn', disabled: i === n - 1, onclick: () => go2(i + 1) }, 'Suivante →'))));
-      drawToc();
+        h('div', { class: 'row between', style: { marginTop: '14px' } }, h('button', { class: 'btn', disabled: i === 0, onclick: () => go2(i - 1) }, '← Précédente'),
+          h('button', { class: 'btn primary', title: 'Valide cette étape et passe à la suivante', onclick: () => { setStep(gu.id, i, true); if (i < n - 1) { go2(i + 1); } else { draw(); toast('Guide terminé 🎉'); } } }, i === n - 1 ? '✔ Terminer' : 'Suivante →'))));
     }
     const key = (e) => { if (!document.getElementById('main') || !location.hash.startsWith('#/guides') || /INPUT|TEXTAREA|SELECT/.test((e.target || {}).tagName || '')) return; if (g.view !== 'liste') { if (e.key === 'ArrowRight') go2(i + 1); else if (e.key === 'ArrowLeft') go2(i - 1); } };
     document.addEventListener('keydown', key); Views._cleanup = () => { document.removeEventListener('keydown', key); refreshBars = () => {}; };

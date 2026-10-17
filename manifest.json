@@ -1,14 +1,14 @@
 {
-"version": "1.4.5",
-"notes": "Guides : onglets fermables et stables",
+"version": "1.4.6",
+"notes": "Guides sans sommaire (Suivante valide l'étape), carte du monde à la taille de l'écran",
 "files": {
 "css/carte2.css": {
 "h": "3601dfdbba0cf796f08c50867e8b16738e34d1c126cca626dddfe0d70626ac85",
 "s": 450
 },
 "css/style.css": {
-"h": "c09c0803452e67a91b32c0c1ffb9e52f715a852800d3a857013cedb27ba10324",
-"s": 92335
+"h": "a933b4861630f18fa4b83e1503ab0f2adaed7c25bc78f278c83131cafd1b223b",
+"s": 92361
 },
 "data/almanax.js": {
 "h": "e8e2ec568980d33e9c3847295668cf84e55d93b0b3a538ab4dd5dfdccf22f4d4",
@@ -1039,8 +1039,8 @@
 "s": 19534
 },
 "js/views-guides.js": {
-"h": "2599944521305ac012ad32dcb7146a34763f2ec746ae22c9ecdc2297cc43717f",
-"s": 43024
+"h": "8964efbadaf8946f233172f0112662559e7877879fe5ab62a4a111812e1f88d6",
+"s": 42394
 },
 "js/views-monde.js": {
 "h": "f344c6592130e8936a1287ffb3bb333e17cb309c7954c2eada56962aea3a7f2f",
