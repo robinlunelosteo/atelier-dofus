@@ -1,6 +1,6 @@
 {
-"version": "1.4.7",
-"notes": "Guides : reprise à la première étape non faite",
+"version": "1.5.0",
+"notes": "Bouton « Mettre à jour » intégré à l'appli, onglets de guides, reprise des guides, carte",
 "files": {
 "css/carte2.css": {
 "h": "3601dfdbba0cf796f08c50867e8b16738e34d1c126cca626dddfe0d70626ac85",
@@ -999,8 +999,8 @@
 "s": 3254
 },
 "index.html": {
-"h": "f409d73e45afc03b808b4d5b9c6381f4a07fee8249a2ba21265992c6338c3897",
-"s": 1873
+"h": "b68f91bc24b9e8d675b3abf63c512bf10550e7ad36a9f7afdbcc9d9e60c5744d",
+"s": 1918
 },
 "js/core.js": {
 "h": "af78e940d425f4ab3ac2ea392e5476b72382646b3bd71370c52638d4709338ba",
@@ -1009,6 +1009,10 @@
 "js/desktop-sync.js": {
 "h": "834d79ea586b7ece483e41879552e176d459556e23f503a6600454e3fa3f0bb1",
 "s": 5216
+},
+"js/desktop-update.js": {
+"h": "0360c02bfe25b41df906587c025686a06dd77ef96650ffd4ed7095f4f01615a2",
+"s": 2411
 },
 "js/mapview.js": {
 "h": "9b23d5bba9c22218e2ae169188a6bb8bb4030bffbd6f145448a5f141e3b305aa",
