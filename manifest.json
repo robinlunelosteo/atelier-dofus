@@ -1,14 +1,14 @@
 {
-"version": "1.5.0",
-"notes": "Bouton « Mettre à jour » intégré à l'appli, onglets de guides, reprise des guides, carte",
+"version": "1.5.1",
+"notes": "Apparence identique à Cabinéo : thème Auto/Clair/Sombre et couleur de l'application",
 "files": {
 "css/carte2.css": {
 "h": "3601dfdbba0cf796f08c50867e8b16738e34d1c126cca626dddfe0d70626ac85",
 "s": 450
 },
 "css/style.css": {
-"h": "a933b4861630f18fa4b83e1503ab0f2adaed7c25bc78f278c83131cafd1b223b",
-"s": 92361
+"h": "5e1df526138dd288013d8b1b2ba21b130afaba8d98d01a0aa424c2cc1c97a227",
+"s": 89455
 },
 "data/almanax.js": {
 "h": "e8e2ec568980d33e9c3847295668cf84e55d93b0b3a538ab4dd5dfdccf22f4d4",
@@ -1003,8 +1003,8 @@
 "s": 1918
 },
 "js/core.js": {
-"h": "af78e940d425f4ab3ac2ea392e5476b72382646b3bd71370c52638d4709338ba",
-"s": 31287
+"h": "8200c7d69b20ea1e69376a5063ea2f373647ca623328d211aadb509f04261f56",
+"s": 28689
 },
 "js/desktop-sync.js": {
 "h": "834d79ea586b7ece483e41879552e176d459556e23f503a6600454e3fa3f0bb1",
@@ -1047,8 +1047,8 @@
 "s": 42560
 },
 "js/views-monde.js": {
-"h": "f344c6592130e8936a1287ffb3bb333e17cb309c7954c2eada56962aea3a7f2f",
-"s": 24928
+"h": "2ac24b201e81023f972bfcf46435d10a538cedd96a7019bebb2fb0fbf11e0387",
+"s": 23658
 },
 "js/views-ocre-almanax.js": {
 "h": "f3a37a52afab9bb54e94d97b0529aa24ac535861c0414339d290cc1f6eb9b016",
