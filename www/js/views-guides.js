@@ -306,9 +306,11 @@
 
   function reader(main, gu) {
     const u = U(); const g = G(); const n = gu.n; let i = curStep(gu.id); const PER = 1; if (g.last !== gu.id) { g.last = gu.id; touch(); }
-    const tabIds = [...g.follow.filter((x) => LIB.has(x))]; if (!tabIds.includes(gu.id)) tabIds.push(gu.id);
-    if (tabIds.length > 1) main.appendChild(h('div', { class: 'gx-tabs' }, tabIds.map((id) => { const t = LIB.get(id); const w0 = who(); const d = w0.length ? Math.min(...w0.map((pid) => countDone(id, pid))) : 0;
-      return h('button', { class: 'gx-tab' + (id === gu.id ? ' on' : ''), title: t.name, onclick: () => { U().open = id; rerender(); window.scrollTo(0, 0); } }, h('span', null, t.name), h('i', { style: { width: pct(d, t.n) + '%' } })); })));
+    if (!g.tabs) g.tabs = [...g.follow]; if (!g.tabs.includes(gu.id)) { g.tabs.push(gu.id); touch(); }
+    const tabIds = g.tabs.filter((x) => LIB.has(x));
+    main.appendChild(h('div', { class: 'gx-tabs' }, tabIds.map((id) => { const t = LIB.get(id); const w0 = who(); const d = w0.length ? Math.min(...w0.map((pid) => countDone(id, pid))) : 0;
+      const close = (e) => { e.stopPropagation(); g.tabs = g.tabs.filter((x) => x !== id); touch(); if (id === gu.id) { const nx = tabIds.filter((x) => x !== id); if (nx.length) U().open = nx[Math.max(0, tabIds.indexOf(id) - 1)] === id ? nx[0] : nx[Math.max(0, tabIds.indexOf(id) - 1)]; else { U().open = null; location.hash = '#/guides'; } } rerender(); };
+      return h('div', { class: 'gx-tab' + (id === gu.id ? ' on' : ''), title: t.name, onclick: () => { U().open = id; rerender(); window.scrollTo(0, 0); } }, h('span', null, t.name), h('button', { class: 'gx-x', title: 'Fermer cet onglet', onclick: close }, '✕'), h('i', { style: { width: pct(d, t.n) + '%' } })); })));
     main.appendChild(h('div', { class: 'gx-top' },
       h('button', { class: 'btn ghost', onclick: () => { u.open = null; location.hash = '#/guides'; rerender(); } }, '← Guides'),
       h('div', { class: 'gx-title' }, h('h2', null, gu.name), h('small', { class: 'muted' }, 'par ' + gu.author + ' · ' + gu.n + ' étapes')),

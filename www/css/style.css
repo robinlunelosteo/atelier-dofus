@@ -264,3 +264,8 @@ html[data-lt]{--gy:#9a6700;--gr:#c62828;--gb:#0a5fc2}
 .gx-tab span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gx-tab i{position:absolute;left:0;bottom:0;height:3px;background:var(--green)}
 .gx-tab.on{border-color:var(--gold);color:var(--txt);font-weight:600}
+
+.gx-tab{display:flex;align-items:center;gap:6px;padding-right:6px}
+.gx-tab span{flex:1;min-width:0}
+.gx-x{background:none;border:0;color:var(--muted);cursor:pointer;font-size:12px;padding:2px 5px;border-radius:6px;line-height:1}
+.gx-x:hover{background:var(--inset);color:var(--txt)}
