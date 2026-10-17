@@ -1,6 +1,6 @@
 {
-"version": "1.4.6",
-"notes": "Guides sans sommaire (Suivante valide l'étape), carte du monde à la taille de l'écran",
+"version": "1.4.7",
+"notes": "Guides : reprise à la première étape non faite",
 "files": {
 "css/carte2.css": {
 "h": "3601dfdbba0cf796f08c50867e8b16738e34d1c126cca626dddfe0d70626ac85",
@@ -1039,8 +1039,8 @@
 "s": 19534
 },
 "js/views-guides.js": {
-"h": "8964efbadaf8946f233172f0112662559e7877879fe5ab62a4a111812e1f88d6",
-"s": 42394
+"h": "23cf55fd3b0249228f8038c58a3b7cab8e635ae81bae83949b95ce97fa932b8f",
+"s": 42560
 },
 "js/views-monde.js": {
 "h": "f344c6592130e8936a1287ffb3bb333e17cb309c7954c2eada56962aea3a7f2f",

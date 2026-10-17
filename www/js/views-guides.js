@@ -64,7 +64,9 @@
   const countDone = (gid, pid) => { const gu = LIB.get(gid); if (!gu) return 0; let n = 0; for (let i = 0; i < gu.n; i++) if (isDone(gid, pid, i)) n++; return n; };
   function setStep(gid, i, val) { G().last = gid; who().forEach((pid) => { pg(gid, pid)['s' + i] = val ? 1 : 0; }); touch(); }
   function setCheck(gid, i, k, val) { who().forEach((pid) => { pg(gid, pid)['c' + i + '.' + k] = val ? 1 : 0; }); touch(); }
-  const curStep = (gid) => { const gu = LIB.get(gid); const c = G().cur[gid]; return clamp(c == null ? 0 : c, 0, gu.n - 1); };
+  const curStep = (gid) => { const gu = LIB.get(gid); const c = G().cur[gid]; const w = who(); let nx = gu.n - 1;
+    if (w.length) for (let k = 0; k < gu.n; k++) if (!w.every((pid) => isDone(gid, pid, k))) { nx = k; break; }
+    return clamp(Math.max(c == null ? 0 : c, nx), 0, gu.n - 1); };
   const firstTodo = (gid) => { const gu = LIB.get(gid); const w = who(); for (let i = 0; i < gu.n; i++) if (w.some((pid) => !isDone(gid, pid, i))) return i; return gu.n - 1; };
 
   /* ---- rendu sécurisé du HTML d'une étape ---- */
